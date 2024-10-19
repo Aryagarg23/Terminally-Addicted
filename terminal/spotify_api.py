@@ -30,34 +30,40 @@ if current_playback is not None and current_playback['is_playing']:
                 current_index = i
                 break
 
-    if current_index is not None and current_index + 1 < len(queue):
-        # Play the next song in the queue
-        next_track = queue[current_index + 1]
-        sp.start_playback(uris=[next_track['uri']])
-        print(f"Playing next track: {next_track['name']} by {next_track['artists'][0]['name']}")
-    else:
-        print("No next track in the queue. Please enter a song name to search for a new track.")
+        if current_index is not None and current_index + 1 < len(queue):
+            # Play the next song in the queue
+            next_track = queue[current_index + 1]
+            sp.start_playback(uris=[next_track['uri']])
+            print(f"Playing next track: {next_track['name']} by {next_track['artists'][0]['name']}")
+        else:
+            print("No next track in the queue. Searching for new tracks.")
+            # No next track, search for new tracks
 else:
-    print("No track is currently playing. Please enter a song name to search for a new track.")
+    print("No track is currently playing. Searching for new tracks.")
 
-# Search for a song if no playback is ongoing
-song_name = input("Please enter a song name (or press Enter to play a random one): ")
+# Prompt user for a song name or play a random one
+song_name = input("Please enter a song name (or press Enter to play a random track): ")
 
 if song_name:
-    results = sp.search(q=song_name, type='track', limit=10)
+    results = sp.search(q=song_name, type='track', limit=20)
     
     if results['tracks']['items']:
-        track = results['tracks']['items'][0]  # Get the first result
-        track_uri = track['uri']
+        # Shuffle the search results
+        shuffled_tracks = random.sample(results['tracks']['items'], len(results['tracks']['items']))
+        # Start playback with the first track in shuffled results
+        track_to_play = shuffled_tracks[0]
+        track_uri = track_to_play['uri']
         sp.start_playback(uris=[track_uri])
-        print(f"Playing: {track['name']} by {track['artists'][0]['name']}")
+        print(f"Playing: {track_to_play['name']} by {track_to_play['artists'][0]['name']}")
     else:
         print("No tracks found for your search.")
 else:
-    # Play a random track from the previously searched results
+    # Play a random track from a broader search if no song name is provided
     random_results = sp.search(q='*', type='track', limit=50)  # Search for a wider range of tracks
     if random_results['tracks']['items']:
         random_track = random.choice(random_results['tracks']['items'])
         track_uri = random_track['uri']
         sp.start_playback(uris=[track_uri])
         print(f"Playing a random track: {random_track['name']} by {random_track['artists'][0]['name']}")
+    else:
+        print("No random tracks found.")
