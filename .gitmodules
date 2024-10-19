@@ -1,0 +1,3 @@
+[submodule "libs/pot"]
+	path = libs/pot
+	url = https://github.com/SeungheonOh/pot
