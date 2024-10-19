@@ -7,7 +7,7 @@ import server.setup
 
 # Manually call the setup function from setup.py
 setup_folder_path = 'buffer'  # Replace with actual folder path
-server.setup.setup_buffer(setup_folder_path)
+server.setup.setup_buffer(setup_folder_path) #makes a chat.txt as a chatbot buffer
 
 
 # from server.chatbot import llama_response
