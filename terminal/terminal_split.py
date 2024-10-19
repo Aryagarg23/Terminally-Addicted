@@ -1,4 +1,26 @@
 import curses
+import subprocess
+import os
+import tempfile
+
+def open_vim_and_get_input():
+    # Create a temporary file for Vim to edit
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        temp_filename = temp_file.name
+    
+    try:
+        # Launch Vim and wait for the user to finish editing
+        subprocess.run(['vim', temp_filename])
+
+        # Read the content from the temporary file
+        with open(temp_filename, 'r') as file:
+            content = file.readlines()
+
+    finally:
+        # Cleanup the temporary file
+        os.remove(temp_filename)
+
+    return content
 
 def main(stdscr):
     # Initial setup
@@ -63,11 +85,38 @@ def main(stdscr):
             if key == curses.KEY_BACKSPACE or key == 127:  # Handle backspace
                 command_input = command_input[:-1]
             elif key == curses.KEY_ENTER or key == 10:  # Enter key
-                # Put command input into the top right panel
-                top_right.clear()
-                top_right.border()
-                top_right.addstr(1, 1, f"Output: {command_input}")
-                top_right.refresh()
+                # If the command is "/chat"
+                if command_input.startswith("/chat"):
+                    # Handle /chat -v for Vim input
+                    if command_input == "/chat -v":
+                        # Close the curses interface temporarily and open Vim
+                        curses.endwin()  # Close the curses window
+                        vim_output_lines = open_vim_and_get_input()  # Open Vim and get input
+                        curses.doupdate()  # Restart the curses interface
+
+                        # Calculate the maximum number of lines we can display in the top right panel
+                        max_display_lines = 2 
+                        
+                        # Truncate Vim output if it's too long
+                        if len(vim_output_lines) > max_display_lines:
+                            vim_output_lines = ["..."] + vim_output_lines[-(max_display_lines - 1):]
+
+                        # Put the Vim output into the top right panel
+                        top_right.clear()
+                        top_right.border()
+
+                        # Display the Vim output lines
+                        for i, line in enumerate(vim_output_lines):
+                            top_right.addstr(i + 1, 1, line.strip())
+
+                        top_right.refresh()
+
+                    else:
+                        # If it's a regular "/chat" command, place it in top-right
+                        top_right.clear()
+                        top_right.border()
+                        top_right.addstr(1, 1, f"User: {command_input}")
+                        top_right.refresh()
 
                 # Reset command input and show placeholder again
                 command_input = ""
