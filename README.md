@@ -8,10 +8,10 @@ Welcome to **Terminally-Addicted**, the project where everything happens in the 
 
 ## Features 🚀
 
-- 🎵 **Spotify Integration** : Use `/sp` commands to control your jams without ever leaving the terminal. Play, pause, skip tracks, or jump to your favorite song like a true command-line DJ. 🎶
-- 🐙 **GitHub Issue Manager** : `/git` lets you manage your repos, create, close, and comment on issues—all from within the terminal. GitHub? More like GitGood! 💻
-- 📋 **Todoist Task Manager** : `/todo` helps you stay productive with your ever-growing task list. Add tasks, list them, or avoid them entirely while browsing ASCII art. We don't judge. 😉
-- 🤖 **GPT Chatbot** : `/chat` to have those deep, philosophical convos with a bot. Or just get it to tell you a joke. We got range. 💬
+- 🎵 **Spotify Integration** : Use `$sp` commands to control your jams without ever leaving the terminal. Play, pause, skip tracks, or jump to your favorite song like a true command-line DJ. 🎶
+- 🐙 **GitHub Issue Manager** : `$git` lets you manage your repos, create, close, and comment on issues—all from within the terminal. GitHub? More like GitGood! 💻
+- 📋 **Todoist Task Manager** : `$todo` helps you stay productive with your ever-growing task list. Add tasks, list them, or avoid them entirely while browsing ASCII art. We don't judge. 😉
+- 🤖 **GPT Chatbot** : `$chat` to have those deep, philosophical convos with a bot. Or just get it to tell you a joke. We got range. 💬
 - 📺 **YouTube Video Viewer** : `/yt` lets you watch videos in your terminal, because who needs high-def videos when you can have **ASCII art**?! 🎥🤓
 - 🔧 **Environment Manager** : `/set env` to tweak your environment on the fly. And yes, you’ll be editing it with Vim. Terminal nerds, rejoice! 🚀
 
@@ -40,31 +40,34 @@ python terminal/main.py
 ## Command Guide 📝
 
 ### Spotify Commands 🎧
-- `/sp -cs <song_name>`: Change to a specific song. 🕺
-- `/sp -next`: Skip to the next track because you’re too cool to listen to a full song. 🎛️
-- `/sp -prev`: Rewind time and play the previous track. 🔁
-- `/sp -ps`: Pause the music when your boss catches you “working.” 🎼🙄
-- `/sp -pl`: Play that funky music again. 🔊
+- `$sp -cs <song_name>`: Change to a specific song. 🕺
+- `$sp -next`: Skip to the next track because you’re too cool to listen to a full song. 🎛️
+- `$sp -prev`: Rewind time and play the previous track. 🔁
+- `$sp -ps`: Pause the music when your boss catches you “working.” 🎼🙄
+- `$sp -pl`: Play that funky music again. 🔊
 
 ### Chatbot Commands 🤖
-- `/chat`: Get a short, sweet response from our bot buddy. It’s like texting, but cooler. 📨
-- `/chat -l`: Get a long, philosophical rant—perfect for those deep work distractions. 🧠💬
-- `/chat -l -cls`: Have a fresh conversation by clearing the chat history. New year, new bot! 🌱
+- `$chat`: Get a short, sweet response from our bot buddy. It’s like texting, but cooler. 📨
+- `$chat -l`: Get a long, philosophical rant—perfect for those deep work distractions. 🧠💬
+- `$chat -l -cls`: Have a fresh conversation by clearing the chat history. New year, new bot! 🌱
 
 ### GitHub Issue Commands 🐙
-- `/git create <title> -body=Your issue description -labels=bug,urgent`: Create an issue with flair. 📝🐛
-- `/git -close <issue_number>`: Close issues with a single keystroke. Feels powerful, doesn’t it? 💥
-- `/git -comment <issue_number> "This is a comment"`: Drop some wisdom (or a meme) on an issue. 💬💡
-- `/git -list -state=open`: List all open issues in style. No browser required. 🛠️
-- `/git set repo owner/repo_name`: Set your repository and dominate the world of code from the terminal. 🔧🌍
+- `$git create <title> -body=Your issue description -labels=bug,urgent`: Create an issue with flair. 📝🐛
+- `$git -close <issue_number>`: Close issues with a single keystroke. Feels powerful, doesn’t it? 💥
+- `$git -comment <issue_number> "This is a comment"`: Drop some wisdom (or a meme) on an issue. 💬💡
+- `$git -list -state=open`: List all open issues in style. No browser required. 🛠️
+- `$git set repo owner/repo_name`: Set your repository and dominate the world of code from the terminal. 🔧🌍
 
 ### Todoist Commands 📋
-- `/todo -list`: Show your tasks. Yes, the ones you’ve been avoiding. 📝
-- `/todo -add <task>`: Add a new task to your ever-growing list of things to procrastinate on. 😅
-- `/todo -list -more`: Scroll through more tasks (if you dare). 📜
+- `$todo -list`: Show your tasks. Yes, the ones you’ve been avoiding. 📝
+- `$todo -add <task>`: Add a new task to your ever-growing list of things to procrastinate on. 😅
+- `$todo -list -more`: Scroll through more tasks (if you dare). 📜
 
 ### YouTube Viewer 📺
-- `/yt search <search for videos>`: Watch a video in glorious **ASCII** art. Who needs HD when you have ASCII?! 😂 Just type in your search query, and we’ll pick the most relevant video for you. No choices, no freedom—just pure terminal magic. 🎥✨
+- `$yt search <search for videos>`: Watch a video in glorious **ASCII** art. Who needs HD when you have ASCII?! 😂 Just type in your search query, and we’ll pick the most relevant video for you. No choices, no freedom—just pure terminal magic. 🎥✨
+
+### Downloader
+- `$download <url>`: Download ANY video on the internet given a URL! Insane, especially when you're editing videos or need quick assets.
 
 ## Shell Name? Suggestions Needed! 💡
 We still need a catchy name for our shell. Help us out by suggesting something equally ridiculous and awesome. Current contenders:
@@ -78,9 +81,8 @@ Feel free to drop your own crazy ideas in the issues section! (Please, we really
 
 ## Known Bugs 🐞
 - **Spotify sometimes skips backward in time.** We're calling it a feature. 🎵🕰️
-- **GitHub bot is too polite.** Working on making it sassier. 🐙💬
-- **Todoist makes you question your life choices.** Sorry, no fix for that one. 💭🤔
 - **ASCII YouTube might cause pixel-induced eye strain.** Proceed with caution. 👀🖼️
+- **ChatGPT ghosts you sometimes, but eventually locks back in.** Be patient with him.
 
 ## Contributing 🤝
 Wanna add more terminal madness? Fork this repo, submit a PR, and join the terminal cult! 😎🖥️

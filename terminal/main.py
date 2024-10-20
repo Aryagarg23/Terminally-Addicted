@@ -15,6 +15,15 @@ from libs.media_player.downloader import download_media
 
 load_dotenv()
 
+# Define the directory structure
+root_dir = "output_files"
+media_dir = os.path.join(root_dir, "media")
+text_dir = os.path.join(root_dir, "text")
+
+# Create directories
+os.makedirs(media_dir, exist_ok=True)
+os.makedirs(text_dir, exist_ok=True)
+
 COMMANDS_HELP = {
 '$help': 'Display this help information.',
 '$set env': 'Open the .env file in Vim for editing.',
@@ -322,7 +331,7 @@ def main(stdscr):
                 
                 elif command_input.startswith('$download'):
                     url = command_input[len('$download') + 1:]
-                    download_media(url,output_folder='/output_files/media')
+                    download_media(url,output_folder='./output_files/media')
 
                 # Reset command input and show placeholder again
                 command_input = ""

@@ -82,3 +82,33 @@ def download_media(youtube_url, output_folder="./buffer/media"):
     except Exception as e:
         print(f"An error occurred while downloading audio: {e}")
 
+import os
+import yt_dlp
+
+def save_link(youtube_url, output_path):
+    """
+    Downloads a YouTube or X.com video in the highest quality available (audio and video) 
+    and saves it as a single MP4 file.
+
+    Args:
+        youtube_url (str): URL of the video to download.
+        output_path (str): Full path (including filename) where the MP4 will be saved.
+    """
+    # Ensure the output folder exists
+    output_folder = os.path.dirname(output_path)
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    # Download the MP4 (highest quality video with audio)
+    ydl_opts = {
+        'format': 'bestvideo+bestaudio/best',  # Download best video and audio
+        'outtmpl': output_path,  # Save video at the specified output path
+        'merge_output_format': 'mp4',  # Merge video and audio into an mp4 file
+    }
+
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([youtube_url])
+        print(f"Download complete! Video saved as {output_path}")
+    except Exception as e:
+        print(f"An error occurred while downloading: {e}")
