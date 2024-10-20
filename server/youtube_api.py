@@ -28,7 +28,6 @@ def search_youtube(keyword, api_key):
         
         # Extract video details from the results
         for item in results['items']:
-            # Ensure that the item is a video
             if item['id']['kind'] == 'youtube#video':
                 video_id = item['id']['videoId']
                 video_url = f"https://www.youtube.com/watch?v={video_id}"

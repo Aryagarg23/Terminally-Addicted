@@ -4,14 +4,13 @@ import os
 class ChatBot:
     def __init__(self):
         self.client = OpenAI()
-        self.api_key = os.getenv("OPENAI_API_KEY")  # Make sure you set your API key as an environment variable
+        self.api_key = os.getenv("OPENAI_API_KEY")  
         self.client.api_key = self.api_key
         
         # Define paths for history storage
         self.history_file = "buffer/chat.txt"
         self.current_input_file = "buffer/chat_current_input.txt"
         
-        # Ensure buffer directory exists
         os.makedirs("buffer", exist_ok=True)
 
     def generate_response(self, prompt):
