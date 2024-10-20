@@ -2,6 +2,7 @@ import curses
 import subprocess
 import os
 import sys
+import re
 from dotenv import load_dotenv
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from server.spotify_api import display_current_playback, change_song, next_track, previous_track, pause, play
@@ -15,25 +16,25 @@ from libs.media_player.downloader import download_media
 load_dotenv()
 
 COMMANDS_HELP = {
-'/help': 'Display this help information.',
-'/set env': 'Open the .env file in Vim for editing.',
-'/chat -l': 'Open a long chat response in Vim.',
-'/chat -s': 'Send a short chat message.',
-'/sp -cs <song name>': 'Change the current song to the specified song name.',
-'/sp -next': 'Play the next track in the queue.',
-'/sp -prev': 'Play the previous track in the queue.',
-'/sp -ps': 'Pause the current playback.',
-'/sp -pl': 'Start playback of the currently queued track.',
-'/git -create <title> [body] [labels]': 'Create a new GitHub issue with title, optional body, and labels.',
-'/git -close <issue_number>': 'Close a GitHub issue by its number.',
-'/git -comment <issue_number> <comment>': 'Comment on a GitHub issue.',
-'/git -list [--state=<open|closed>]': 'List GitHub issues (default: open).',
-'/git -update <issue_number> [title] [body]': 'Update a GitHub issue with new title and/or body.',
-'/git -search <label>': 'Search GitHub issues by a specific label.',
-'/git set repo <owner/repo_name>': 'Set the current GitHub repository.',
-'/todo -list': 'List all Todoist tasks.',
-'/todo -add <task name>': 'Add a new task to Todoist.',
-'/yt search <query>': 'Search and play a YouTube video based on the query.',
+'$help': 'Display this help information.',
+'$set env': 'Open the .env file in Vim for editing.',
+'$chat -l': 'Open a long chat response in Vim.',
+'$chat -s': 'Send a short chat message.',
+'$sp -cs <song name>': 'Change the current song to the specified song name.',
+'$sp -next': 'Play the next track in the queue.',
+'$sp -prev': 'Play the previous track in the queue.',
+'$sp -ps': 'Pause the current playback.',
+'$sp -pl': 'Start playback of the currently queued track.',
+'$git -create <title> [body] [labels]': 'Create a new GitHub issue with title, optional body, and labels.',
+'$git -close <issue_number>': 'Close a GitHub issue by its number.',
+'$git -comment <issue_number> <comment>': 'Comment on a GitHub issue.',
+'$git -list [--state=<open|closed>]': 'List GitHub issues (default: open).',
+'$git -update <issue_number> [title] [body]': 'Update a GitHub issue with new title and$or body.',
+'$git -search <label>': 'Search GitHub issues by a specific label.',
+'$git set repo <owner$repo_name>': 'Set the current GitHub repository.',
+'$todo -list': 'List all Todoist tasks.',
+'$todo -add <task name>': 'Add a new task to Todoist.',
+'$yt search <query>': 'Search and play a YouTube video based on the query.',
 }
 
 def main(stdscr):
@@ -95,7 +96,7 @@ def main(stdscr):
             continue
 
         # Check for starting command input
-        if key == ord('/'):
+        if key == ord('$'):
             typing_mode = True
             command_input = ""  # Reset input when entering typing mode
             text_entry_panel.clear()
@@ -107,14 +108,14 @@ def main(stdscr):
             if key == curses.KEY_BACKSPACE or key == 127:  # Handle backspace
                 command_input = command_input[:-1]
             elif key == curses.KEY_ENTER or key == 10:  # Enter key
-                if command_input.startswith("/help"):
+                if command_input.startswith("$help"):
                     # Construct the help text to display
                     help_text = "\n".join([f"{cmd}: {desc}" for cmd, desc in COMMANDS_HELP.items()])
 
                     # Display help text in the right panel
                     display_git_responses(right_panel, [help_text])
-                    
-                if command_input.startswith("/set env"):
+
+                if command_input.startswith("$set env"):
                     # Open the .env file in Vim
                     curses.endwin()  # End the curses session before opening Vim
                     subprocess.run(['vim', 'server/.env'])  # Open .env file
@@ -124,15 +125,15 @@ def main(stdscr):
                     continue  # Continue t`he main loop
 
                 # If the command is "/chat"
-                if command_input.startswith("/chat"):
-                    if command_input == "/chat -l":
+                if command_input.startswith("$chat"):
+                    if command_input == "$chat -l":
                         # Close the curses interface temporarily and open Vim
                         curses.endwin()  # Close the curses window
                         subprocess.run(['vim', 'buffer/chat_current_input.txt'])
                         curses.doupdate()  # Restart the curses interface
 
                         # Call response_generator for a long response
-                        if command_input.startswith('/chat -l -cls'):
+                        if command_input.startswith('$chat -l -cls'):
                             keep_his = False
                         else:
                             keep_his = True
@@ -145,15 +146,22 @@ def main(stdscr):
                         # Calculate available lines for the right panel
                         max_lines = height - 6  # Subtracting space for border and other UI elements
 
+                        characters = re.findall(r'[a-zA-Z]+', bot_response[0:10])
+
+                        result = ''.join(characters)
+                        
+                        with open(f'output_files/text/{result}.txt', 'w') as f:
+                            f.write(result) 
+
                         display_titles(top_left, bottom_left, right_panel)
                         display_or_open_in_vim(right_panel, bot_response, max_lines, display_current_playback())
                     
-                    elif command_input.startswith('/chat -s'):
+                    elif command_input.startswith('$chat -s'):
                         # Save short input to file for short response
                         with open('buffer/chat_current_input.txt', 'w+') as f:
-                            f.write(command_input[(len('/chat -s') + 1):])
+                            f.write(command_input[(len('$chat -s') + 1):])
 
-                        if command_input.startswith('/chat -l --cls'):
+                        if command_input.startswith('$chat -l --cls'):
                             keep_his = False
                         else:
                             keep_his = True
@@ -161,7 +169,7 @@ def main(stdscr):
                         bot_response = response_generator(keep_history=keep_his, short_or_long=1)
 
                         # Add short response to user outputs
-                        user_outputs.append(f"User: {command_input[(len('/chat -s --cls') + 1):]}")
+                        user_outputs.append(f"User: {command_input[(len('$chat -s --cls') + 1):]}")
                         user_outputs.append(f"Bot: {bot_response}")
 
                         # Calculate available lines for the right panel
@@ -178,34 +186,34 @@ def main(stdscr):
                         for i, output in enumerate(user_outputs[start_index:end_index], start=2):  # Start at row 2 to leave space for the border
                             right_panel.addstr(i, 1, output, curses.color_pair(1))  # Show all user outputs in green
                         right_panel.refresh()
-                elif command_input.startswith("/sp"):
-                    if command_input.startswith("/sp -cs"):
+                elif command_input.startswith("$sp"):
+                    if command_input.startswith("$sp -cs"):
                         song_name = command_input[8:]
                         change_song(song_name)
                         reset_text_bar(text_entry_panel)
-                    elif command_input.startswith("/sp -next"):
+                    elif command_input.startswith("$sp -next"):
                         next_track()
                         reset_text_bar(text_entry_panel)
-                    elif command_input.startswith("/sp -prev"):
+                    elif command_input.startswith("$sp -prev"):
                         try:
                             previous_track()
                             reset_text_bar(text_entry_panel)
                         except:
                             reset_text_bar(text_entry_panel)
-                    elif command_input.startswith("/sp -ps"):
+                    elif command_input.startswith("$sp -ps"):
                         pause()
                         reset_text_bar(text_entry_panel)
-                    elif command_input.startswith("/sp -pl"):
+                    elif command_input.startswith("$sp -pl"):
                         try:
                             play()
                         except:
                             reset_text_bar(text_entry_panel)
                         reset_text_bar(text_entry_panel)
-                elif command_input.startswith("/git"):
+                elif command_input.startswith("$git"):
                     response = None  # Initialize response variable
-                    if command_input.startswith("/git -create"):
+                    if command_input.startswith("$git -create"):
                         # Extract the command arguments from the input
-                        args = command_input[len("/git -create") + 1:].strip().split(' --')
+                        args = command_input[len("$git -create") + 1:].strip().split(' --')
                         title = args[0]
                         body = None
                         labels = []
@@ -221,19 +229,19 @@ def main(stdscr):
                         # Create an issue
                         response = manager.create_issue(title, body, labels)
 
-                    elif command_input.startswith("/git -close"):
-                        issue_number = command_input[len("/git -close") + 1:].strip()
+                    elif command_input.startswith("$git -close"):
+                        issue_number = command_input[len("$git -close") + 1:].strip()
                         response = manager.close_issue(issue_number)
 
-                    elif command_input.startswith("/git -comment"):
+                    elif command_input.startswith("$git -comment"):
                         # Extract the issue number and comment text
-                        parts = command_input[len("/git -comment") + 1:].strip().split(' ', 1)
+                        parts = command_input[len("$git -comment") + 1:].strip().split(' ', 1)
                         issue_number = parts[0]
                         comment = parts[1] if len(parts) > 1 else ''
                         response = manager.comment_on_issue(issue_number, comment)
 
-                    elif command_input.startswith("/git -list"):
-                        state_arg = command_input[len("/git -list") + 1:].strip()
+                    elif command_input.startswith("$git -list"):
+                        state_arg = command_input[len("$git -list") + 1:].strip()
                         state = 'open'  # Default to 'open'
                         
                         if state_arg.startswith('--state'):
@@ -241,8 +249,8 @@ def main(stdscr):
                         
                         response = manager.list_issues(state)
 
-                    elif command_input.startswith("/git -update"):
-                        args = command_input[len("/git -update") + 1:].strip().split(' --')
+                    elif command_input.startswith("$git -update"):
+                        args = command_input[len("$git -update") + 1:].strip().split(' --')
                         issue_number = args[0]
                         new_title = None
                         new_body = None
@@ -256,35 +264,35 @@ def main(stdscr):
 
                         response = manager.update_issue(issue_number, new_title, new_body)
 
-                    elif command_input.startswith("/git -search"):
-                        label = command_input[len("/git -search") + 1:].strip()
+                    elif command_input.startswith("$git -search"):
+                        label = command_input[len("$git -search") + 1:].strip()
                         response = manager.search_issues_by_label(label)
 
-                    elif command_input.startswith("/git set repo"):
+                    elif command_input.startswith("$git set repo"):
                         parts = command_input[14:].strip().split(' ')
                         if len(parts) == 2:
                             owner, repo_name = parts
                             manager.set_owner_repo(owner, repo_name)
                             response = f"Repository set to: {owner}/{repo_name}"
                         else:
-                            response = "Invalid format. Use /git set repo owner/repo_name"
+                            response = "Invalid format. Use $git set repo owner/repo_name"
                     # Add response to git_responses if there is one
                     if response:
                         git_responses.append(response)
                         display_git_responses(bottom_left, git_responses)  # Update the bottom left pane
 
-                elif command_input.startswith("/todo -list"):
+                elif command_input.startswith("$todo -list"):
                     tasks = todoist.get_tasks()  # Fetch tasks once
                     total_tasks = len(tasks)  # Update total tasks count
                     # Display first four tasks or notify if less than four
                     display_tasks(top_left, tasks[current_page:current_page + page_size])
 
-                elif command_input.startswith("/todo -add"):
+                elif command_input.startswith("$todo -add"):
                     # Extract the task name and create a new task
-                    task_name = command_input[len("/todo -add") + 1:]  # Get the task name after the command
+                    task_name = command_input[len("$todo -add") + 1:]  # Get the task name after the command
                     response = todoist.create_task(task_name)
 
-                elif command_input == "/todo -list --more":
+                elif command_input == "$todo -list --more":
                     # Show next set of tasks if available
                     current_page += page_size
                     if current_page < total_tasks:
@@ -293,7 +301,7 @@ def main(stdscr):
                         # No more tasks available
                         display_tasks(top_left, ["No more tasks available."])
                     
-                elif command_input.startswith('/yt search'):
+                elif command_input.startswith('$yt search'):
                     api_key = os.getenv('YOUTUBE_API_TOKEN')
                     search_query = command_input[11:]
                     videos = search_youtube(search_query, api_key)
@@ -311,6 +319,10 @@ def main(stdscr):
                     curses.curs_set(1)  # Show the cursor again
                     stdscr.refresh()
                     main(stdscr)  # Restart the main function to restore the UI
+                
+                elif command_input.startswith('$download'):
+                    url = command_input[len('$download') + 1:]
+                    download_media(url,output_folder='/output_files/media')
 
                 # Reset command input and show placeholder again
                 command_input = ""
