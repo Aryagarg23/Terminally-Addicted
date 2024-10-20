@@ -18,7 +18,7 @@ def play_video_and_audio():
     # Set the paths relative to the base directory
     media_dir = os.path.join(base_dir, 'buffer', 'media')
     video_path = "./buffer/media/buffer_video.mp4"
-    audio_path = "/home/raihan_rafeek/projects/Terminally-Addicted/buffer/media/buffer_audio.mp3"
+    audio_path = os.path.join(media_dir, 'buffer_audio.mp3')
     # Get the Python script's PID
     python_pid = os.getpid()
     print(f"Python script PID: {python_pid}")
