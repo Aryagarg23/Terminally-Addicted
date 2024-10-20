@@ -5,12 +5,13 @@ Welcome to **Terminally-Addicted**, the project where everything happens in the 
 You never have to leave. No, really... you don’t. Trust us. 🌀
 
 ## Features 🚀
-- **Spotify Integration** 🎵: Use `/sp` commands to control your jams without ever leaving the terminal. Play, pause, skip tracks, or jump to your favorite song like a true command-line DJ. 🎶
-- **GitHub Issue Manager** 🐙: `/git` lets you manage your repos, create, close, and comment on issues—all from within the terminal. GitHub? More like GitGood! 💻
-- **Todoist Task Manager** 📋: `/todo` helps you stay productive with your ever-growing task list. Add tasks, list them, or avoid them entirely while browsing ASCII art. We don't judge. 😉
-- **GPT Chatbot** 🤖: `/chat` to have those deep, philosophical convos with a bot. Or just get it to tell you a joke. We got range. 💬
-- **YouTube Video Viewer** 📺: `/yt` lets you watch videos in your terminal, because who needs high-def videos when you can have **ASCII art**?! 🎥🤓
-- **Environment Manager** 🔧: `/set env` to tweak your environment on the fly. And yes, you’ll be editing it with Vim. Terminal nerds, rejoice! 🚀
+
+- 🎵 **Spotify Integration** : Use `/sp` commands to control your jams without ever leaving the terminal. Play, pause, skip tracks, or jump to your favorite song like a true command-line DJ. 🎶
+- 🐙 **GitHub Issue Manager** : `/git` lets you manage your repos, create, close, and comment on issues—all from within the terminal. GitHub? More like GitGood! 💻
+- 📋 **Todoist Task Manager** : `/todo` helps you stay productive with your ever-growing task list. Add tasks, list them, or avoid them entirely while browsing ASCII art. We don't judge. 😉
+- 🤖 **GPT Chatbot** : `/chat` to have those deep, philosophical convos with a bot. Or just get it to tell you a joke. We got range. 💬
+- 📺 **YouTube Video Viewer** : `/yt` lets you watch videos in your terminal, because who needs high-def videos when you can have **ASCII art**?! 🎥🤓
+- 🔧 **Environment Manager** : `/set env` to tweak your environment on the fly. And yes, you’ll be editing it with Vim. Terminal nerds, rejoice! 🚀
 
 ### Bonus:
 The terminal is now your universe—live in it, breathe it, and never leave it. It’s like *The Matrix*... but with fewer phone booths and more curses (pun intended). 😜
