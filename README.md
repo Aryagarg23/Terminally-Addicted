@@ -3,7 +3,7 @@
 Welcome to **Terminally-Addicted**, the project where everything happens in the terminal—and VIM. Because why should you ever leave the beautiful, cozy, blinking cursor life? From playing your favorite Spotify tracks 🎧 to managing your GitHub issues 🐙, chatting with a GPT-powered bot 🤖, and organizing your life with Todoist 📝, everything is packed inside your good ol’ terminal and beloved VIM editor. No JavaScript, no flashy interfaces—just pure, unadulterated terminal and VIM goodness.
 
 
-# **_You never have to leave. No, really... you don’t. Trust us. 🌀_**
+## **_You never have to leave. No, really... you don’t. Trust us. 🌀_**
 
 
 ## Features 🚀
