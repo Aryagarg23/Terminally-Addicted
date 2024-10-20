@@ -39,6 +39,7 @@ def change_song(song_name, sp=SP):
 
     if song_name:
         results = sp.search(q=song_name, type='track', limit=20)
+        device = sp.devices()['devices'][0]
         
         if results['tracks']['items']:
             previous_search_results = results['tracks']['items']  # Update previous search results
@@ -50,7 +51,7 @@ def change_song(song_name, sp=SP):
             clear_current_queue(sp)
 
             # Start playback with the first track in shuffled results
-            play_track(shuffled_tracks[0])
+            play_track(device=device,track=shuffled_tracks[0])
             queue_tracks(shuffled_tracks[1:])
 
         else:
@@ -59,7 +60,7 @@ def change_song(song_name, sp=SP):
         if previous_search_results:
             # Shuffle previous search results
             shuffled_tracks = random.sample(previous_search_results, len(previous_search_results))
-            play_track(shuffled_tracks[0])
+            play_track(track=shuffled_tracks[0], device=device)
             queue_tracks(shuffled_tracks[1:])
         else:
             play_related_tracks(current_playback)
@@ -75,8 +76,8 @@ def clear_current_queue(sp=SP):
             return("Skipped a track in the queue.")
         return f"Current queue size: {queue_size}"
     
-def play(sp = SP):
-    sp.start_playback()
+def play(sp = SP, device=None):
+    sp.start_playback(device_id=device['id'])
 
 def pause(sp = SP):
     SP.pause_playback()
@@ -87,10 +88,13 @@ def next_track(sp = SP):
 def previous_track(sp = SP):
     SP.previous_track()
 
-def play_track(track, sp=SP):
+def play_track(track, sp=SP, device=None):
     """Start playback of a specified track."""
     track_uri = track['uri']
-    sp.start_playback(uris=[track_uri])
+    if device:
+        sp.start_playback(uris=[track_uri], device_id=[device['id']])
+    else:
+        sp.start_playback(uris=[track_uri])
 
 def queue_tracks(tracks, sp=SP):
     """Queue additional tracks."""
@@ -105,8 +109,8 @@ def play_related_tracks(current_playback, sp=SP):
 
         if recommendations['tracks']:
             related_tracks = random.sample(recommendations['tracks'], len(recommendations['tracks']))
-            play_track(sp, related_tracks[0])
-            queue_tracks(sp, related_tracks[1:])
+            play_track(track=related_tracks[0])
+            queue_tracks(related_tracks[1:])
         else:
             print("No related tracks found.")
     else:
@@ -117,7 +121,7 @@ def play_random_track(sp=SP):
     random_results = sp.search(q='*', type='track', limit=50)  # Search for a wider range of tracks
     if random_results['tracks']['items']:
         random_track = random.choice(random_results['tracks']['items'])
-        play_track(sp, random_track)
+        play_track(track=random_track)
     else:
         print("No random tracks found.")
 

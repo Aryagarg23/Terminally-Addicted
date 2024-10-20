@@ -2,12 +2,18 @@ import curses
 import subprocess
 import os
 import sys
+from dotenv import load_dotenv
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from server.spotify_api import display_current_playback, change_song, next_track, previous_track, pause, play
 from server.chatbot import response_generator  
 from server.github_api import GitHubIssueManager
 from server.todoist import TodoistAPI
+from server.youtube_api import search_youtube
 from terminal.helpers import reset_text_bar, display_or_open_in_vim, display_titles, display_git_responses, display_tasks
+from libs.media_player.term_video import play_video_and_audio
+from libs.media_player.downloader import download_media
+
+load_dotenv()
 
 def main(stdscr):
     # Initial setup
@@ -53,11 +59,11 @@ def main(stdscr):
 
     manager = GitHubIssueManager()
     todoist = TodoistAPI()
-    
+
+
     while True:
         # Read input and only refresh when Enter is pressed
         key = stdscr.getch()
-
         # Exit on 'q'
         if key == ord('q'):
             break
@@ -98,7 +104,7 @@ def main(stdscr):
                         curses.doupdate()  # Restart the curses interface
 
                         # Call response_generator for a long response
-                        if command_input.startswith('/chat -l -cls'):
+                        if command_input.startswith('/chat -l --cls'):
                             keep_his = False
                         else:
                             keep_his = True
@@ -239,18 +245,18 @@ def main(stdscr):
                         git_responses.append(response)
                         display_git_responses(bottom_left, git_responses)  # Update the bottom left pane
 
-                elif command_input.startswith("/todo list"):
+                elif command_input.startswith("/todo -list"):
                     tasks = todoist.get_tasks()  # Fetch tasks once
                     total_tasks = len(tasks)  # Update total tasks count
                     # Display first four tasks or notify if less than four
                     display_tasks(top_left, tasks[current_page:current_page + page_size])
 
-                elif command_input.startswith("/todo add "):
+                elif command_input.startswith("/todo -add"):
                     # Extract the task name and create a new task
                     task_name = command_input[10:]  # Get the task name after the command
                     response = todoist.create_task(task_name)
 
-                elif command_input == "/todo list -more":
+                elif command_input == "/todo -list --more":
                     # Show next set of tasks if available
                     current_page += page_size
                     if current_page < total_tasks:
@@ -259,11 +265,30 @@ def main(stdscr):
                         # No more tasks available
                         display_tasks(top_left, ["No more tasks available."])
                     
+                elif command_input.startswith('/yt search'):
+                    api_key = os.getenv('YOUTUBE_API_TOKEN')
+                    search_query = command_input[11:]
+                    videos = search_youtube(search_query, api_key)
+                    curses.endwin()
+                    os.system('clear')
+                    download_media(videos[0]['url'])
+                    try:
+                        # Run the video player script and wait for it to finish
+                        subprocess.run(['python3', 'libs/media_player/term_video.py'])
+                    except Exception as e:
+                        print(f"Error playing video: {e}")
+
+                    # Reinitialize curses after playback
+                    stdscr.clear()
+                    curses.curs_set(1)  # Show the cursor again
+                    stdscr.refresh()
+                    main(stdscr)  # Restart the main function to restore the UI
 
                 # Reset command input and show placeholder again
                 command_input = ""
                 typing_mode = False
                 reset_text_bar(text_entry_panel)
+
 
             else:
                 # Add character to command input

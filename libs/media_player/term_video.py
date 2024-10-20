@@ -12,9 +12,13 @@ def play_video_and_audio():
     The video and audio files are expected to be named 'buffer_video.mp4' and 'buffer_audio.mp3',
     located in the './buffer/media/' directory.
     """
-    video_path = "./buffer/media/buffer_video.mp4"
-    audio_path = "/home/arya/projects/HackOHIO/Terminally-Addicted/buffer/media/buffer_audio.mp3"
+    # Get the base directory of the script
+    base_dir = os.path.dirname(os.path.abspath(__file__))
 
+    # Set the paths relative to the base directory
+    media_dir = os.path.join(base_dir, 'buffer', 'media')
+    video_path = "./buffer/media/buffer_video.mp4"
+    audio_path = "/home/raihan_rafeek/projects/Terminally-Addicted/buffer/media/buffer_audio.mp3"
     # Get the Python script's PID
     python_pid = os.getpid()
     print(f"Python script PID: {python_pid}")
@@ -85,5 +89,5 @@ def play_video_and_audio():
 
     print("Both video and audio playback finished.")
 
-# Call the function to play video and audio
-play_video_and_audio()
+if __name__=="__main__":
+    play_video_and_audio()

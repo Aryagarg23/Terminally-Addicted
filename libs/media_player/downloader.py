@@ -82,5 +82,3 @@ def download_media(youtube_url, output_folder="./buffer/media"):
     except Exception as e:
         print(f"An error occurred while downloading audio: {e}")
 
-# Example usage:
-download_media('https://www.instagram.com/reel/DAgBY9IoUtA/?utm_source=ig_web_copy_link')
