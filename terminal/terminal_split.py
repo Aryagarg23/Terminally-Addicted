@@ -5,12 +5,43 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from long_query import open_vim_and_get_input
 from server.spotify_api import display_current_playback, change_song, next_track, previous_track, pause, play
+from server.chatbot import response_generator  # Import the response generator
 
 def reset_text_bar(text_bar):
     text_bar.clear()
     text_bar.border()
     text_bar.addstr(1, 1, f"> {display_current_playback()}", curses.color_pair(2))  # Show placeholder text
     text_bar.refresh()
+
+def display_or_open_in_vim(panel, content, max_lines, placeholder_text):
+    """
+    Display content in the panel if it fits, otherwise open it in Vim.
+    """
+    # Calculate how many lines the content will take
+    content_lines = content.splitlines()
+    
+    if len(content_lines) <= max_lines:
+        # If it fits within the available space, display it
+        panel.clear()
+        panel.border()
+        for i, line in enumerate(content_lines[:max_lines], start=2):  # Start after the border
+            panel.addstr(i, 1, line, curses.color_pair(1))
+        panel.refresh()
+    else:
+        # If the response is too long, write to a file and open Vim
+        with open('buffer/long_response.txt', 'w') as f:
+            f.write(content)
+        
+        # Close curses, open Vim, then resume curses
+        curses.endwin()
+        subprocess.run(['vim', 'buffer/long_response.txt'])
+        curses.doupdate()
+
+        # Reset the placeholder text after exiting Vim
+        panel.clear()
+        panel.border()
+        panel.addstr(1, 1, f"> {placeholder_text}", curses.color_pair(2))
+        panel.refresh()
 
 # Main function for the curses interface
 def main(stdscr):
@@ -92,55 +123,50 @@ def main(stdscr):
                         curses.doupdate()  # Restart the curses interface
 
                         # Save the Vim output to the text file
-                        with open('../buffer/chat_current_input.txt', 'w+') as f:
+                        with open('buffer/chat_current_input.txt', 'w') as f:
                             f.write(vim_output)
 
-                        # Add Vim output to user outputs
-                        user_outputs.append(f"User: {vim_output.strip()}")  # Append output to the list
+                        # Call response_generator for a long response
+                        if command_input.startswith('/chat -l -cls'):
+                            keep_his = False
+                        else:
+                            keep_his = True
 
-                        # Display outputs for the current page
-                        right_panel.clear()
-                        right_panel.border()
-                        start_index = current_page * page_size
-                        end_index = start_index + page_size
-                        for i, output in enumerate(user_outputs[start_index:end_index], start=2):  # Start at row 2 to leave space for the border
-                            right_panel.addstr(i, 1, output, curses.color_pair(1))  # Show all user outputs in green
-                        right_panel.refresh()
+                        bot_response = response_generator(keep_history=keep_his, short_or_long=1)
 
+                        # Add Vim output and bot response to user outputs
+                        user_outputs.append(f"User: {vim_output} \n")
+                        user_outputs.append(f"Bot: {bot_response.strip()} \n")
+
+                        # Calculate available lines for the right panel
+                        max_lines = height - 6  # Subtracting space for border and other UI elements
+
+                        # Display outputs or open in Vim if too long
+                        display_or_open_in_vim(right_panel, bot_response, max_lines, display_current_playback())
+                    
                     elif command_input.startswith('/chat -s'):
-                        user_outputs.append(f"User: {command_input[9:]}")  # Append output to the list
+                        # Save short input to file for short response
+                        with open('buffer/chat_current_input.txt', 'w+') as f:
+                            f.write(command_input[9:])  # Save user input after `/chat -s`
 
-                        # Display outputs for the current page
-                        right_panel.clear()
-                        right_panel.border()
-                        start_index = current_page * page_size
-                        end_index = start_index + page_size
-                        for i, output in enumerate(user_outputs[start_index:end_index], start=2):  # Start at row 2 to leave space for the border
-                            right_panel.addstr(i, 1, output, curses.color_pair(1))  # Show all user outputs in green
-                        right_panel.refresh()
-                elif command_input.startswith("/sp"):
-                    if command_input.startswith("/sp -cs"):
-                        song_name = command_input[8:]
-                        change_song(song_name)
-                        reset_text_bar(text_entry_panel)
-                    elif command_input.startswith("/sp -next"):
-                        next_track()
-                        reset_text_bar(text_entry_panel)
-                    elif command_input.startswith("/sp -prev"):
-                        try:
-                            previous_track()
-                            reset_text_bar(text_entry_panel)
-                        except:
-                            reset_text_bar(text_entry_panel)
-                    elif command_input.startswith("/sp -ps"):
-                        pause()
-                        reset_text_bar(text_entry_panel)
-                    elif command_input.startswith("/sp -pl"):
-                        try:
-                            play()
-                        except:
-                            reset_text_bar(text_entry_panel)
-                        reset_text_bar(text_entry_panel)
+                        if command_input.startswith('/chat -l -cls'):
+                            keep_his = False
+                        else:
+                            keep_his = True
+
+                        bot_response = response_generator(keep_history=keep_his, short_or_long=1)
+
+                        # Add short response to user outputs
+                        user_outputs.append(f"User: {command_input[9:]}")
+                        user_outputs.append(f"Bot: {bot_response.strip()}")
+
+                        # Calculate available lines for the right panel
+                        max_lines = height - 6  # Subtracting space for border and other UI elements
+
+                        # Display outputs or open in Vim if too long
+                        display_or_open_in_vim(right_panel, f"User: {command_input[9:]}\nBot: {bot_response}", max_lines, display_current_playback())
+
+                # Handle Spotify controls or other commands here...
 
                 # Reset command input and show placeholder again
                 command_input = ""
