@@ -14,7 +14,30 @@ from libs.media_player.downloader import download_media
 
 load_dotenv()
 
+COMMANDS_HELP = {
+'/help': 'Display this help information.',
+'/set env': 'Open the .env file in Vim for editing.',
+'/chat -l': 'Open a long chat response in Vim.',
+'/chat -s': 'Send a short chat message.',
+'/sp -cs <song name>': 'Change the current song to the specified song name.',
+'/sp -next': 'Play the next track in the queue.',
+'/sp -prev': 'Play the previous track in the queue.',
+'/sp -ps': 'Pause the current playback.',
+'/sp -pl': 'Start playback of the currently queued track.',
+'/git -create <title> [body] [labels]': 'Create a new GitHub issue with title, optional body, and labels.',
+'/git -close <issue_number>': 'Close a GitHub issue by its number.',
+'/git -comment <issue_number> <comment>': 'Comment on a GitHub issue.',
+'/git -list [--state=<open|closed>]': 'List GitHub issues (default: open).',
+'/git -update <issue_number> [title] [body]': 'Update a GitHub issue with new title and/or body.',
+'/git -search <label>': 'Search GitHub issues by a specific label.',
+'/git set repo <owner/repo_name>': 'Set the current GitHub repository.',
+'/todo -list': 'List all Todoist tasks.',
+'/todo -add <task name>': 'Add a new task to Todoist.',
+'/yt search <query>': 'Search and play a YouTube video based on the query.',
+}
+
 def main(stdscr):
+
     # Initial setup
     curses.curs_set(1)  # Show the cursor
     stdscr.nodelay(False)  # Blocking input for Enter key
@@ -84,6 +107,13 @@ def main(stdscr):
             if key == curses.KEY_BACKSPACE or key == 127:  # Handle backspace
                 command_input = command_input[:-1]
             elif key == curses.KEY_ENTER or key == 10:  # Enter key
+                if command_input.startswith("/help"):
+                    # Construct the help text to display
+                    help_text = "\n".join([f"{cmd}: {desc}" for cmd, desc in COMMANDS_HELP.items()])
+
+                    # Display help text in the right panel
+                    display_git_responses(right_panel, [help_text])
+                    
                 if command_input.startswith("/set env"):
                     # Open the .env file in Vim
                     curses.endwin()  # End the curses session before opening Vim
