@@ -47,7 +47,7 @@ python terminal/main.py
 - `/sp -pl`: Play that funky music again. 🔊
 
 ### Chatbot Commands 🤖
-- `/chat -s`: Get a short, sweet response from our bot buddy. It’s like texting, but cooler. 📨
+- `/chat`: Get a short, sweet response from our bot buddy. It’s like texting, but cooler. 📨
 - `/chat -l`: Get a long, philosophical rant—perfect for those deep work distractions. 🧠💬
 - `/chat -l -cls`: Have a fresh conversation by clearing the chat history. New year, new bot! 🌱
 

@@ -156,10 +156,10 @@ def main(stdscr):
                         display_titles(top_left, bottom_left, right_panel)
                         display_or_open_in_vim(right_panel, bot_response, max_lines, display_current_playback())
                     
-                    elif command_input.startswith('$chat -s'):
+                    elif command_input.startswith('$chat'):
                         # Save short input to file for short response
                         with open('buffer/chat_current_input.txt', 'w+') as f:
-                            f.write(command_input[(len('$chat -s') + 1):])
+                            f.write(command_input[(len('$chat') + 1):])
 
                         if command_input.startswith('$chat -l --cls'):
                             keep_his = False
@@ -169,7 +169,7 @@ def main(stdscr):
                         bot_response = response_generator(keep_history=keep_his, short_or_long=1)
 
                         # Add short response to user outputs
-                        user_outputs.append(f"User: {command_input[(len('$chat -s --cls') + 1):]}")
+                        user_outputs.append(f"User: {command_input[(len('$chat --cls') + 1):]}")
                         user_outputs.append(f"Bot: {bot_response}")
 
                         # Calculate available lines for the right panel
