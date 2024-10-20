@@ -22,7 +22,7 @@ Make sure you have all the required dependencies, including `curses`, `subproces
 Then, just clone this bad boy:
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/Terminally-Addicted.git
+git clone https://github.com/Aryagarg23/Terminally-Addicted.git
 cd Terminally-Addicted
 ```
 
