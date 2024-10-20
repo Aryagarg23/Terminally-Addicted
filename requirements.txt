@@ -27,6 +27,8 @@ nvidia-nvtx-cu12==12.4.127
 packaging==24.1
 psutil==6.1.0
 pycryptodomex==3.21.0
+pydub==0.25.1
+python-dotenv==1.0.1
 PyYAML==6.0.2
 redis==5.1.1
 regex==2024.9.11
