@@ -81,4 +81,3 @@ def download_media(youtube_url, output_folder="./buffer/media"):
         print(f"MP3 download and conversion complete! Saved as {audio_output_path}")
     except Exception as e:
         print(f"An error occurred while downloading audio: {e}")
-

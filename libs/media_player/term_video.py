@@ -57,7 +57,7 @@ def play_video_and_audio():
             print(f"Running: go run main.go {video_path} {python_pid}")
 
             # Run the Go program with the video file as an argument
-            cmd = ["go", "run", "main.go", f"../../{video_path}", str(python_pid)]
+            cmd = ["./POT",f"../../{video_path}", str(python_pid)]
             subprocess.run(cmd)
             print("Video playback finished.")
         except Exception as e:
