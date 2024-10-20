@@ -1,5 +1,5 @@
 .cache
-
+server/spotify_credentials.txt
 #buffer folder
 buffer
 #venv folder
