@@ -4,7 +4,13 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from long_query import open_vim_and_get_input
-from server.spotify_api import display_current_playback
+from server.spotify_api import display_current_playback, change_song, next_track
+
+def reset_text_bar(text_bar):
+    text_bar.clear()
+    text_bar.border()
+    text_bar.addstr(1, 1, f"> {display_current_playback()}", curses.color_pair(2))  # Show placeholder text
+    text_bar.refresh()
 
 # Main function for the curses interface
 def main(stdscr):
@@ -29,7 +35,6 @@ def main(stdscr):
     text_entry_panel = curses.newwin(3, width, height - 3, 0)  # 3 rows high
 
     # Initial text
-    placeholder_text = display_current_playback()
     command_input = ""  # For storing the current command input
     typing_mode = False  # Flag for typing mode
 
@@ -44,7 +49,7 @@ def main(stdscr):
     right_panel.addstr(1, 1, "Right Panel (User Outputs)", curses.color_pair(3))  # Border color
 
     # Show placeholder text initially
-    text_entry_panel.addstr(1, 1, f"> {placeholder_text}", curses.color_pair(2))  # Show placeholder text in yellow
+    text_entry_panel.addstr(1, 1, f"> {display_current_playback()}", curses.color_pair(2))  # Show placeholder text in yellow
     text_entry_panel.border()
     
     top_left.refresh()
@@ -113,40 +118,19 @@ def main(stdscr):
                         for i, output in enumerate(user_outputs[start_index:end_index], start=2):  # Start at row 2 to leave space for the border
                             right_panel.addstr(i, 1, output, curses.color_pair(1))  # Show all user outputs in green
                         right_panel.refresh()
+                elif command_input.startswith("/sp"):
+                    if command_input.startswith("/sp -cs"):
+                        song_name = command_input[8:]
+                        change_song(song_name)
+                        reset_text_bar(text_entry_panel)
+                    elif command_input.startswith("/sp -n"):
+                        next_track()
+                        reset_text_bar(text_entry_panel)
 
                 # Reset command input and show placeholder again
                 command_input = ""
                 typing_mode = False
-                text_entry_panel.clear()
-                text_entry_panel.border()
-                text_entry_panel.addstr(1, 1, f"> {placeholder_text}", curses.color_pair(2))  # Show placeholder text
-                text_entry_panel.refresh()
-
-            # Handle pagination commands
-            elif command_input.startswith("/p"):
-                if command_input[-1] == 'n':  # Next page
-                    if (current_page + 1) * page_size < len(user_outputs):
-                        current_page += 1
-                elif command_input[-1] == 'p':  # Previous page
-                    if current_page > 0:
-                        current_page -= 1
-
-                # Reset command input and update the right panel
-                command_input = ""
-                typing_mode = False
-                text_entry_panel.clear()
-                text_entry_panel.border()
-                text_entry_panel.addstr(1, 1, f"> {placeholder_text}", curses.color_pair(2))  # Show placeholder text
-                text_entry_panel.refresh()
-
-                # Display outputs for the current page
-                right_panel.clear()
-                right_panel.border()
-                start_index = current_page * page_size
-                end_index = start_index + page_size
-                for i, output in enumerate(user_outputs[start_index:end_index], start=2):  # Start at row 2 to leave space for the border
-                    right_panel.addstr(i, 1, output, curses.color_pair(1))  # Show all user outputs in green
-                right_panel.refresh()
+                reset_text_bar(text_entry_panel)
 
             else:
                 # Add character to command input
@@ -160,13 +144,11 @@ def main(stdscr):
             text_entry_panel.refresh()
         else:
             # Just refresh the text entry panel if not typing
-            text_entry_panel.clear()
-            text_entry_panel.border()
-            text_entry_panel.addstr(1, 1, f"> {placeholder_text}", curses.color_pair(2))  # Show placeholder text in yellow
-            text_entry_panel.refresh()
+            reset_text_bar(text_entry_panel)
 
         # Update other panes, only when not typing
         if not typing_mode:
+            reset_text_bar(text_entry_panel)
             top_left.clear()
             top_left.border()
             top_left.addstr(1, 1, "Top Left Pane", curses.color_pair(3))  # Border color

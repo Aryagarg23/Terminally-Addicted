@@ -46,15 +46,15 @@ def display_current_playback(sp = SP):
         returnstring = ("No track is currently playing.")
         return returnstring
 
-def change_song(current_playback, previous_search_results, sp=SP):
+def change_song(song_name, sp=SP):
     """Change the currently playing song based on user input or play a random track."""
-    song_name = input("Please enter a song name (or press Enter to play a random track): ")
+    current_playback = sp.current_playback()['item']['id']
 
     if song_name:
         results = sp.search(q=song_name, type='track', limit=20)
         
         if results['tracks']['items']:
-            previous_search_results[:] = results['tracks']['items']  # Update previous search results
+            previous_search_results = results['tracks']['items']  # Update previous search results
 
             # Shuffle the search results
             shuffled_tracks = random.sample(previous_search_results, len(previous_search_results))
@@ -82,23 +82,24 @@ def clear_current_queue(sp=SP):
     current_playback = sp.current_playback()
     if current_playback and current_playback.get('context'):
         queue_size = current_playback.get('queue_length', 0)
-        print(f"Current queue size: {queue_size}")
 
         for _ in range(queue_size):
             sp.next_track()  # Skip to the next track in the queue
-            print("Skipped a track in the queue.")
+            return("Skipped a track in the queue.")
+        return f"Current queue size: {queue_size}"
+    
+def next_track(sp = SP):
+    sp.next_track()
 
 def play_track(track, sp=SP):
     """Start playback of a specified track."""
     track_uri = track['uri']
     sp.start_playback(uris=[track_uri])
-    print(f"Playing: {track['name']} by {track['artists'][0]['name']}")
 
 def queue_tracks(tracks, sp=SP):
     """Queue additional tracks."""
     for track in tracks:
         sp.add_to_queue(track['uri'])  # Add each track to the queue individually
-    print("Added more tracks to the queue.")
 
 def play_related_tracks(current_playback, sp=SP):
     """Play related tracks based on the currently playing track."""
