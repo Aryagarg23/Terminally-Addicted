@@ -4,7 +4,7 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from long_query import open_vim_and_get_input
-from server.spotify_api import display_current_playback, change_song, next_track
+from server.spotify_api import display_current_playback, change_song, next_track, previous_track, pause, play
 
 def reset_text_bar(text_bar):
     text_bar.clear()
@@ -123,8 +123,23 @@ def main(stdscr):
                         song_name = command_input[8:]
                         change_song(song_name)
                         reset_text_bar(text_entry_panel)
-                    elif command_input.startswith("/sp -n"):
+                    elif command_input.startswith("/sp -next"):
                         next_track()
+                        reset_text_bar(text_entry_panel)
+                    elif command_input.startswith("/sp -prev"):
+                        try:
+                            previous_track()
+                            reset_text_bar(text_entry_panel)
+                        except:
+                            reset_text_bar(text_entry_panel)
+                    elif command_input.startswith("/sp -ps"):
+                        pause()
+                        reset_text_bar(text_entry_panel)
+                    elif command_input.startswith("/sp -pl"):
+                        try:
+                            play()
+                        except:
+                            reset_text_bar(text_entry_panel)
                         reset_text_bar(text_entry_panel)
 
                 # Reset command input and show placeholder again

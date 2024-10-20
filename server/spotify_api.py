@@ -88,8 +88,17 @@ def clear_current_queue(sp=SP):
             return("Skipped a track in the queue.")
         return f"Current queue size: {queue_size}"
     
+def play(sp = SP):
+    sp.start_playback()
+
+def pause(sp = SP):
+    SP.pause_playback()
+    
 def next_track(sp = SP):
     sp.next_track()
+
+def previous_track(sp = SP):
+    SP.previous_track()
 
 def play_track(track, sp=SP):
     """Start playback of a specified track."""
