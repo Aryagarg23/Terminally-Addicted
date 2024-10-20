@@ -3,6 +3,7 @@ import subprocess
 import os
 import tempfile
 import sys
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 import server.setup
 
@@ -42,6 +43,11 @@ def main(stdscr):
 
     height, width = stdscr.getmaxyx()
 
+    curses.start_color()  # Start color functionality
+    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)  # User output color (green text)
+    curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLACK)  # Placeholder color (yellow text)
+    curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)   # Border color (white text)
+
     # Create split panes
     top_left = curses.newwin(height // 2, width // 2, 0, 0)
     bottom_left = curses.newwin(height // 2, width // 2, height // 2, 0)
@@ -55,13 +61,16 @@ def main(stdscr):
     command_input = ""  # For storing the current command input
     typing_mode = False  # Flag for typing mode
 
+    # List to store user outputs
+    user_outputs = []
+
     # Display the initial state of the panes
-    top_left.addstr(1, 1, "Top Left Pane")
-    bottom_left.addstr(1, 1, "Bottom Left Pane")
-    right_panel.addstr(1, 1, "Bottom Right Pane")
-    
+    top_left.addstr(1, 1, "Top Left Pane", curses.color_pair(3))  # Border color
+    bottom_left.addstr(1, 1, "Bottom Left Pane", curses.color_pair(3))  # Border color
+    right_panel.addstr(1, 1, "Right Panel (User Outputs)", curses.color_pair(3))  # Border color
+
     # Show placeholder text initially
-    text_entry_panel.addstr(1, 1, f"> {placeholder_text}")  # Show placeholder text
+    text_entry_panel.addstr(1, 1, f"> {placeholder_text}", curses.color_pair(2))  # Show placeholder text in yellow
     text_entry_panel.border()
     
     top_left.refresh()
@@ -107,16 +116,26 @@ def main(stdscr):
                         with open(vim_output_file_path, 'w+') as f:
                             f.write(vim_output)
 
-                        # Put the Vim output into the top right panel
+                        # Add Vim output to user outputs
+                        user_outputs.append(f"User: {vim_output.strip()}")  # Append output to the list
+
+                        # Display all user outputs in the right panel
                         right_panel.clear()
                         right_panel.border()
-                        right_panel.addstr(1, 1, f"User: ...\n{vim_output[-35:]}")  # Show the last part if long
+                        # Display the last 10 outputs, or fewer if there are not enough
+                        for i, output in enumerate(user_outputs[-10:], start=2):  # Start at row 2 to leave space for the border
+                            right_panel.addstr(i, 1, output, curses.color_pair(1))  # Show all user outputs in green
                         right_panel.refresh()
 
                     elif command_input.startswith('/chat -s'):
+                        user_outputs.append(f"User: {command_input[9:]}")  # Append output to the list
+
+                        # Display all user outputs in the right panel
                         right_panel.clear()
                         right_panel.border()
-                        right_panel.addstr(1, 1, f"User: {command_input[9:]}")
+                        # Display the last 10 outputs, or fewer if there are not enough
+                        for i, output in enumerate(user_outputs[-10:], start=2):  # Start at row 2 to leave space for the border
+                            right_panel.addstr(i, 1, output, curses.color_pair(1))  # Show all user outputs in green
                         right_panel.refresh()
 
                 # Reset command input and show placeholder again
@@ -124,7 +143,7 @@ def main(stdscr):
                 typing_mode = False
                 text_entry_panel.clear()
                 text_entry_panel.border()
-                text_entry_panel.addstr(1, 1, f"> {placeholder_text}")  # Show placeholder text
+                text_entry_panel.addstr(1, 1, f"> {placeholder_text}", curses.color_pair(2))  # Show placeholder text
                 text_entry_panel.refresh()
             else:
                 # Add character to command input
@@ -134,30 +153,28 @@ def main(stdscr):
             # Display the current command input in the text entry panel
             text_entry_panel.clear()
             text_entry_panel.border()
-            text_entry_panel.addstr(1, 1, f"> {command_input}")  # Show current input
+            text_entry_panel.addstr(1, 1, f"> {command_input}", curses.color_pair(2))  # Show current input in yellow
             text_entry_panel.refresh()
         else:
             # Just refresh the text entry panel if not typing
             text_entry_panel.clear()
             text_entry_panel.border()
-            text_entry_panel.addstr(1, 1, f"> {placeholder_text}")  # Show placeholder text
+            text_entry_panel.addstr(1, 1, f"> {placeholder_text}", curses.color_pair(2))  # Show placeholder text in yellow
             text_entry_panel.refresh()
 
         # Update other panes, only when not typing
         if not typing_mode:
             top_left.clear()
             top_left.border()
-            top_left.addstr(1, 1, "Top Left Pane")
+            top_left.addstr(1, 1, "Top Left Pane", curses.color_pair(3))  # Border color
             top_left.refresh()
 
             bottom_left.clear()
             bottom_left.border()
-            bottom_left.addstr(1, 1, "Bottom Left Pane")
+            bottom_left.addstr(1, 1, "Bottom Left Pane", curses.color_pair(3))  # Border color
             bottom_left.refresh()
 
-            # right_panel.clear()
             right_panel.border()
-            # right_panel.addstr(1, 1, "Chat Pane")
             right_panel.refresh()
 
         # Disable scrolling
