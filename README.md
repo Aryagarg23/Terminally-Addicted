@@ -62,7 +62,7 @@ python main.py
 - `/todo list -more`: Scroll through more tasks (if you dare). 📜
 
 ### YouTube Viewer 📺
-- `/yt <video_url>`: Watch a video in glorious **ASCII**. Who needs HD when you have ASCII art? 😂
+- `/yt <search for videos>`: Watch a video in glorious **ASCII** art. Who needs HD when you have ASCII?! 😂 Just type in your search query, and we’ll pick the most relevant video for you. No choices, no freedom—just pure terminal magic. 🎥✨
 
 ## Shell Name? Suggestions Needed! 💡
 We still need a catchy name for our shell. Help us out by suggesting something equally ridiculous and awesome. Current contenders:
