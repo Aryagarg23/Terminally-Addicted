@@ -1,5 +1,6 @@
 ```
 git pull
+huggingface-cli login
 git submodule update --init --recursive
 ```
 
