@@ -1,26 +1,14 @@
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import random
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-# Function to load credentials from a text file
-def load_credentials_from_txt(file_path):
-    """Load Spotify API credentials from a text file."""
-    credentials = {}
-    try:
-        with open(file_path, 'r') as file:
-            for line in file:
-                key, value = line.strip().split('=')
-                credentials[key] = value
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File '{file_path}' not found. Please ensure the file exists and is formatted correctly.")
-    except ValueError:
-        raise ValueError("File format incorrect. Each line should be in the format 'KEY=VALUE'.")
-    return credentials
-
-def initialize_spotify_client(credentials):
+def initialize_spotify_client():
     """Initialize the Spotify client using loaded credentials."""
-    client_id = credentials.get("SPOTIPY_CLIENT_ID")
-    client_secret = credentials.get("SPOTIPY_CLIENT_SECRET")
+    client_id = os.getenv('SPOTIPY_CLIENT_ID', '')
+    client_secret = os.getenv('SPOTIPY_CLIENT_SECRET', '')
 
     if not client_id or not client_secret:
         raise ValueError("Please set the SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET in the text file.")
@@ -32,8 +20,7 @@ def initialize_spotify_client(credentials):
         scope="user-modify-playback-state,user-read-playback-state,user-read-currently-playing"
     ))
 
-SP = initialize_spotify_client(load_credentials_from_txt('/home/raihan_rafeek/projects/Terminally-Addicted/server/spotify_credentials.txt'))
-
+SP = initialize_spotify_client()
 def display_current_playback(sp = SP):
     """Display currently playing track information."""
     current_playback = sp.current_playback()

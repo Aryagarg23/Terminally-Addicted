@@ -1,26 +1,19 @@
 import requests
 import argparse
+import os
+from dotenv import load_dotenv
+load_dotenv()
+github_token = os.getenv('GITHUB_TOKEN', '')
 
 # Replace these with your own values
 owner = "Aryagarg23"
 repo = "Terminally-Addicted"
 url = f"https://api.github.com/repos/{owner}/{repo}/issues"
 
-# Read the access token from the file
-with open('/Users/kaaustaaubshankar/Documents/Coding/Terminally-Addicted/server/spotify_credentials.txt', 'r') as file:
-    lines = file.readlines()
-    token = None
-    for line in lines:
-        if line.startswith("GITHUB_TOKEN="):
-            token = line.split("GITHUB_TOKEN=")[1].strip()
-            break
-
-if not token:
-    raise ValueError("GitHub token not found in the credentials file.")
 
 # Optional headers for authentication
 headers = {
-    "Authorization": f"token {token}"
+    "Authorization": f"token {github_token}"
 }
 
 # Function to create an issue
