@@ -40,7 +40,10 @@ class TodoistAPI:
         response = requests.get(f'{self.base_url}/tasks', headers=self.headers).json()
         strings = []
         for task in response:
-            strings.append(f"{task['content']} due {task['due']['date']}")
+            if task['due']:
+                strings.append(f"{task['content']} due {task['due']['date']}")
+            else:
+                strings.append(f"{task['content']}")
         return strings
 
     def delete_task(self, task_id):
@@ -63,17 +66,3 @@ class TodoistAPI:
             print("Response content is not valid JSON:", response.text)
             return None  # Return None or handle it as needed
 
-def main():
-    """Main function to demonstrate the use of the Todoist API."""
-    todoist = TodoistAPI()
-
-    # Create a new task
-    new_task = todoist.create_task('Buy groceries', 'tomorrow at 12:00')
-    print("New Task:", new_task)
-
-    # Fetch all tasks
-    tasks = todoist.get_tasks()
-    print("Tasks:", tasks)
-
-if __name__ == '__main__':
-    main()

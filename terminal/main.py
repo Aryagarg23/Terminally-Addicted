@@ -53,7 +53,7 @@ def main(stdscr):
 
     manager = GitHubIssueManager()
     todoist = TodoistAPI()
-
+    
     while True:
         # Read input and only refresh when Enter is pressed
         key = stdscr.getch()
