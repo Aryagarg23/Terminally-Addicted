@@ -10,9 +10,6 @@ def initialize_spotify_client():
     client_id = os.getenv('SPOTIPY_CLIENT_ID', '')
     client_secret = os.getenv('SPOTIPY_CLIENT_SECRET', '')
 
-    if not client_id or not client_secret:
-        raise ValueError("Please set the SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET in the text file.")
-
     return spotipy.Spotify(auth_manager=SpotifyOAuth(
         client_id=client_id,
         client_secret=client_secret,
