@@ -7,4 +7,4 @@ hackOHIO
 #pycache
 server/__pycache__
 terminal/__pycache__
-.env
+server/.env

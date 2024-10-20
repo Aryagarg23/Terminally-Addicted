@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from long_query import open_vim_and_get_input
 from server.spotify_api import display_current_playback, change_song, next_track, previous_track, pause, play
 from server.chatbot import response_generator  # Import the response generator
+from server.github_api import GitHubIssueManager
 
 def reset_text_bar(text_bar):
     text_bar.clear()
@@ -42,6 +43,12 @@ def display_or_open_in_vim(panel, content, max_lines, placeholder_text):
         panel.border()
         panel.addstr(1, 1, f"> {placeholder_text}", curses.color_pair(2))
         panel.refresh()
+def display_git_responses(bottom_left, responses):
+    bottom_left.clear()
+    bottom_left.border()
+    for i, response in enumerate(responses, start=2):  # Start at row 2 to leave space for the border
+        bottom_left.addstr(i, 1, response, curses.color_pair(1))  # Show responses in green
+    bottom_left.refresh()
 
 # Main function for the curses interface
 def main(stdscr):
@@ -69,8 +76,9 @@ def main(stdscr):
     command_input = ""  # For storing the current command input
     typing_mode = False  # Flag for typing mode
 
-    # List to store user outputs
+    # List to store user outputs and git responses
     user_outputs = []
+    git_responses = []  # New list to store git command responses
     current_page = 0  # Track the current page
     page_size = 10  # Number of outputs per page
 
@@ -87,6 +95,8 @@ def main(stdscr):
     bottom_left.refresh()
     right_panel.refresh()
     text_entry_panel.refresh()
+
+    manager = GitHubIssueManager()
 
     while True:
         # Read input and only refresh when Enter is pressed
@@ -167,6 +177,108 @@ def main(stdscr):
                         display_or_open_in_vim(right_panel, f"User: {command_input[9:]}\nBot: {bot_response}", max_lines, display_current_playback())
 
                 # Handle Spotify controls or other commands here...
+                        # Display outputs for the current page
+                        right_panel.clear()
+                        right_panel.border()
+                        start_index = current_page * page_size
+                        end_index = start_index + page_size
+                        for i, output in enumerate(user_outputs[start_index:end_index], start=2):  # Start at row 2 to leave space for the border
+                            right_panel.addstr(i, 1, output, curses.color_pair(1))  # Show all user outputs in green
+                        right_panel.refresh()
+                elif command_input.startswith("/sp"):
+                    if command_input.startswith("/sp -cs"):
+                        song_name = command_input[8:]
+                        change_song(song_name)
+                        reset_text_bar(text_entry_panel)
+                    elif command_input.startswith("/sp -next"):
+                        next_track()
+                        reset_text_bar(text_entry_panel)
+                    elif command_input.startswith("/sp -prev"):
+                        try:
+                            previous_track()
+                            reset_text_bar(text_entry_panel)
+                        except:
+                            reset_text_bar(text_entry_panel)
+                    elif command_input.startswith("/sp -ps"):
+                        pause()
+                        reset_text_bar(text_entry_panel)
+                    elif command_input.startswith("/sp -pl"):
+                        try:
+                            play()
+                        except:
+                            reset_text_bar(text_entry_panel)
+                        reset_text_bar(text_entry_panel)
+                elif command_input.startswith("/git"):
+                    response = None  # Initialize response variable
+                    if command_input.startswith("/git create"):
+                        # Extract the command arguments from the input
+                        args = command_input[11:].strip().split(' --')
+                        title = args[0]
+                        body = None
+                        labels = []
+
+                        # Check for additional arguments like body and labels
+                        if len(args) > 1:
+                            for arg in args[1:]:
+                                if arg.startswith('labels='):
+                                    labels = arg[len('labels='):].split(',')
+                                elif body is None:
+                                    body = arg.strip()  # Get the first argument after the title as body
+
+                        # Create an issue
+                        response = manager.create_issue(title, body, labels)
+
+                    elif command_input.startswith("/git close"):
+                        issue_number = command_input[11:].strip()
+                        response = manager.close_issue(issue_number)
+
+                    elif command_input.startswith("/git comment"):
+                        # Extract the issue number and comment text
+                        parts = command_input[13:].strip().split(' ', 1)
+                        issue_number = parts[0]
+                        comment = parts[1] if len(parts) > 1 else ''
+                        response = manager.comment_on_issue(issue_number, comment)
+
+                    elif command_input.startswith("/git list"):
+                        state_arg = command_input[10:].strip()
+                        state = 'open'  # Default to 'open'
+                        
+                        if state_arg.startswith('--state'):
+                            state = state_arg.split('=')[1] if '=' in state_arg else 'open'
+                        
+                        response = manager.list_issues(state)
+
+                    elif command_input.startswith("/git update"):
+                        args = command_input[12:].strip().split(' --')
+                        issue_number = args[0]
+                        new_title = None
+                        new_body = None
+
+                        # Check for new title and body
+                        for arg in args[1:]:
+                            if arg.startswith('title='):
+                                new_title = arg[len('title='):]
+                            elif arg.startswith('body='):
+                                new_body = arg[len('body='):]
+
+                        response = manager.update_issue(issue_number, new_title, new_body)
+
+                    elif command_input.startswith("/git search"):
+                        label = command_input[12:].strip()
+                        response = manager.search_issues_by_label(label)
+
+                    elif command_input.startswith("/git set repo"):
+                        parts = command_input[14:].strip().split(' ')
+                        if len(parts) == 2:
+                            owner, repo_name = parts
+                            manager.set_owner_repo(owner, repo_name)
+                            response = f"Repository set to: {owner}/{repo_name}"
+                        else:
+                            response = "Invalid format. Use /git set repo owner/repo_name"
+                    # Add response to git_responses if there is one
+                    if response:
+                        git_responses.append(response)
+                        display_git_responses(bottom_left, git_responses)  # Update the bottom left pane
 
                 # Reset command input and show placeholder again
                 command_input = ""
@@ -195,9 +307,7 @@ def main(stdscr):
             top_left.addstr(1, 1, "Top Left Pane", curses.color_pair(3))  # Border color
             top_left.refresh()
 
-            bottom_left.clear()
             bottom_left.border()
-            bottom_left.addstr(1, 1, "Bottom Left Pane", curses.color_pair(3))  # Border color
             bottom_left.refresh()
 
             right_panel.border()
