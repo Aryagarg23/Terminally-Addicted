@@ -37,8 +37,11 @@ class TodoistAPI:
 
     def get_tasks(self):
         """Fetch all tasks from Todoist."""
-        response = requests.get(f'{self.base_url}/tasks', headers=self.headers)
-        return self._handle_response(response)
+        response = requests.get(f'{self.base_url}/tasks', headers=self.headers).json()
+        strings = []
+        for task in response:
+            strings.append(f"{task['content']} due {task['due']['date']}")
+        return strings
 
     def delete_task(self, task_id):
         """Delete a task by its ID."""
@@ -64,10 +67,6 @@ def main():
     """Main function to demonstrate the use of the Todoist API."""
     todoist = TodoistAPI()
 
-    # Fetch projects
-    projects = todoist.get_projects()
-    print("Projects:", projects)
-
     # Create a new task
     new_task = todoist.create_task('Buy groceries', 'tomorrow at 12:00')
     print("New Task:", new_task)
@@ -75,15 +74,6 @@ def main():
     # Fetch all tasks
     tasks = todoist.get_tasks()
     print("Tasks:", tasks)
-
-    # Close a task (if you want to close the newly created task)
-    if new_task and 'id' in new_task:
-        closed_task = todoist.close_task(new_task['id'])
-        print("Closed Task:", closed_task)
-
-    # Optionally delete a task (replace '<task_id>' with the actual task ID)
-    # delete_response = todoist.delete_task('<task_id>')
-    # print("Deleted Task Response:", delete_response)
 
 if __name__ == '__main__':
     main()

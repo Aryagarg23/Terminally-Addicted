@@ -5,8 +5,10 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from long_query import open_vim_and_get_input
 from server.spotify_api import display_current_playback, change_song, next_track, previous_track, pause, play
-from server.chatbot import response_generator  # Import the response generator
+from server.chatbot import response_generator  
 from server.github_api import GitHubIssueManager
+from server.todoist import TodoistAPI
+
 
 def reset_text_bar(text_bar):
     text_bar.clear()
@@ -49,9 +51,17 @@ def display_titles(top_left, bottom_left, right_panel):
 
 def display_git_responses(bottom_left, responses):
     bottom_left.border()
-    for i, response in enumerate(responses, start=2):  # Start at row 2 to leave space for the border
+    for i, response in enumerate(responses, start=2): 
         bottom_left.addstr(i, 1, response, curses.color_pair(1))  # Show responses in green
     bottom_left.refresh()
+
+def display_tasks(panel, tasks):
+    panel.border()
+    for i, task in enumerate(tasks, start=2):  # Start displaying tasks from line 2 (after the border)
+        panel.addstr(i, 1, task, curses.color_pair(1))  # Display task
+        panel.addstr(i + 1, 1, " ", curses.color_pair(1))  # Add an empty line for spacing
+        i += 1  # Increment index to account for the additional line
+    panel.refresh()
 
 # Main function for the curses interface
 def main(stdscr):
@@ -97,6 +107,7 @@ def main(stdscr):
     text_entry_panel.refresh()
 
     manager = GitHubIssueManager()
+    todoist = TodoistAPI()
 
     while True:
         # Read input and only refresh when Enter is pressed
@@ -279,6 +290,27 @@ def main(stdscr):
                     if response:
                         git_responses.append(response)
                         display_git_responses(bottom_left, git_responses)  # Update the bottom left pane
+
+                elif command_input.startswith("/todo list"):
+                    tasks = todoist.get_tasks()  # Fetch tasks once
+                    total_tasks = len(tasks)  # Update total tasks count
+                    # Display first four tasks or notify if less than four
+                    display_tasks(top_left, tasks[current_page:current_page + page_size])
+
+                elif command_input.startswith("/todo add "):
+                    # Extract the task name and create a new task
+                    task_name = command_input[10:]  # Get the task name after the command
+                    response = todoist.create_task(task_name)
+
+                elif command_input == "/todo list -more":
+                    # Show next set of tasks if available
+                    current_page += page_size
+                    if current_page < total_tasks:
+                        display_tasks(top_left, tasks[current_page:current_page + page_size])
+                    else:
+                        # No more tasks available
+                        display_tasks(top_left, ["No more tasks available."])
+                    
 
                 # Reset command input and show placeholder again
                 command_input = ""
