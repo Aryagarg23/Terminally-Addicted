@@ -2,7 +2,8 @@ import curses
 import subprocess
 import os
 import tempfile
-
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 import server.setup
 
 # Manually call the setup function from setup.py

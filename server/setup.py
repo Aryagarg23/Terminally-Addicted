@@ -22,7 +22,15 @@ def setup_buffer(folder_path):
     with open(file_path, 'w') as file:
         file.write("This is the chat log.\n")
 
-    print(f"'chat.txt' has been created in {folder_path}")
+    print(f"'chat_current_input.txt' has been created in {folder_path}")
+        # Define the file path for the "chat.txt"
+    file_path = os.path.join(folder_path, 'chat_current_input.txt')
+
+    # Create (or overwrite) the "chat.txt" file
+    with open(file_path, 'w') as file:
+        file.write("This is the chat log.\n")
+
+    print(f"'chat_current_input.txt' has been created in {folder_path}")
 
 # Call the setup function
 if __name__ == "__main__":
