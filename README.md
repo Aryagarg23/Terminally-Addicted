@@ -32,7 +32,7 @@ cd Terminally-Addicted
 Fire up the terminal of your dreams with:
 
 ```bash
-python main.py
+python terminal/main.py
 ```
 
 **Pro tip**: If your terminal crashes from awesomeness, that's normal. Just reboot and try again. 😎
