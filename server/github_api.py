@@ -75,7 +75,7 @@ class GitHubIssueManager:
             result = []
             for issue in issues:
                 result.append(f"Issue #{issue['number']}: {issue['title']} (State: {issue['state']})")
-            return "\n".join(result)
+            return "\n ".join(result)
         else:
             return f"Failed to retrieve {state} issues: {response.status_code}, {response.text}"
 

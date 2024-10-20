@@ -23,7 +23,6 @@ def display_or_open_in_vim(panel, content, max_lines, placeholder_text):
     
     if len(content_lines) <= max_lines:
         # If it fits within the available space, display it
-        panel.clear()
         panel.border()
         for i, line in enumerate(content_lines[:max_lines], start=2):  # Start after the border
             panel.addstr(i, 1, line, curses.color_pair(1))
@@ -39,12 +38,16 @@ def display_or_open_in_vim(panel, content, max_lines, placeholder_text):
         curses.doupdate()
 
         # Reset the placeholder text after exiting Vim
-        panel.clear()
         panel.border()
         panel.addstr(1, 1, f"> {placeholder_text}", curses.color_pair(2))
         panel.refresh()
+
+def display_titles(top_left, bottom_left, right_panel):
+    top_left.addstr(1, 1, "To-Do List", curses.color_pair(3)) 
+    bottom_left.addstr(1, 1, "GitHub Issues", curses.color_pair(3)) 
+    right_panel.addstr(1, 1, "ChatBot", curses.color_pair(3))  
+
 def display_git_responses(bottom_left, responses):
-    bottom_left.clear()
     bottom_left.border()
     for i, response in enumerate(responses, start=2):  # Start at row 2 to leave space for the border
         bottom_left.addstr(i, 1, response, curses.color_pair(1))  # Show responses in green
@@ -82,10 +85,7 @@ def main(stdscr):
     current_page = 0  # Track the current page
     page_size = 10  # Number of outputs per page
 
-    # Display the initial state of the panes
-    top_left.addstr(1, 1, "Top Left Pane", curses.color_pair(3))  # Border color
-    bottom_left.addstr(1, 1, "Bottom Left Pane", curses.color_pair(3))  # Border color
-    right_panel.addstr(1, 1, "Right Panel (User Outputs)", curses.color_pair(3))  # Border color
+    display_titles(top_left, bottom_left, right_panel)
 
     # Show placeholder text initially
     text_entry_panel.addstr(1, 1, f"> {display_current_playback()}", curses.color_pair(2))  # Show placeholder text in yellow
@@ -145,13 +145,13 @@ def main(stdscr):
                         bot_response = response_generator(keep_history=keep_his, short_or_long=1)
 
                         # Add Vim output and bot response to user outputs
-                        user_outputs.append(f"User: {vim_output} \n")
-                        user_outputs.append(f"Bot: {bot_response.strip()} \n")
+                        user_outputs.append(f"User: {vim_output} \n  ")
+                        user_outputs.append(f"Bot: {bot_response} \n  ")
 
                         # Calculate available lines for the right panel
                         max_lines = height - 6  # Subtracting space for border and other UI elements
 
-                        # Display outputs or open in Vim if too long
+                        display_titles(top_left, bottom_left, right_panel)
                         display_or_open_in_vim(right_panel, bot_response, max_lines, display_current_playback())
                     
                     elif command_input.startswith('/chat -s'):
@@ -168,17 +168,17 @@ def main(stdscr):
 
                         # Add short response to user outputs
                         user_outputs.append(f"User: {command_input[9:]}")
-                        user_outputs.append(f"Bot: {bot_response.strip()}")
+                        user_outputs.append(f"Bot: {bot_response}")
 
                         # Calculate available lines for the right panel
                         max_lines = height - 6  # Subtracting space for border and other UI elements
 
                         # Display outputs or open in Vim if too long
-                        display_or_open_in_vim(right_panel, f"User: {command_input[9:]}\nBot: {bot_response}", max_lines, display_current_playback())
+                        display_titles(top_left, bottom_left, right_panel)
+                        display_or_open_in_vim(right_panel, f"User: {command_input[9:]}\n  Bot: {bot_response}", max_lines, display_current_playback())
 
                 # Handle Spotify controls or other commands here...
                         # Display outputs for the current page
-                        right_panel.clear()
                         right_panel.border()
                         start_index = current_page * page_size
                         end_index = start_index + page_size
@@ -302,9 +302,7 @@ def main(stdscr):
         # Update other panes, only when not typing
         if not typing_mode:
             reset_text_bar(text_entry_panel)
-            top_left.clear()
             top_left.border()
-            top_left.addstr(1, 1, "Top Left Pane", curses.color_pair(3))  # Border color
             top_left.refresh()
 
             bottom_left.border()
