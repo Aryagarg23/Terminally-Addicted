@@ -1,38 +1,10 @@
 import curses
 import subprocess
 import os
-import tempfile
 import sys
-
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
-import server.setup
-
-# Manually call the setup function from setup.py
-setup_folder_path = 'buffer'  # Path where chat buffer is created
-server.setup.setup_buffer(setup_folder_path)  # Makes chat.txt as a chatbot buffer
-
-# Path to save Vim output
-vim_output_file_path = os.path.join(setup_folder_path, 'chat_current_input.txt')
-
-# Function to open Vim and return the input
-def open_vim_and_get_input():
-    # Create a temporary file for Vim to edit
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        temp_filename = temp_file.name
-
-    try:
-        # Launch Vim and wait for the user to finish editing
-        subprocess.run(['vim', temp_filename])
-
-        # Read the content from the temporary file
-        with open(temp_filename, 'r') as file:
-            content = file.read()
-
-    finally:
-        # Cleanup the temporary file
-        os.remove(temp_filename)
-
-    return content
+from long_query import open_vim_and_get_input
+from server.spotify_api import display_current_playback
 
 # Main function for the curses interface
 def main(stdscr):
@@ -50,19 +22,21 @@ def main(stdscr):
 
     # Create split panes
     top_left = curses.newwin(height // 2, width // 2, 0, 0)
-    bottom_left = curses.newwin(height // 2, width // 2, height // 2, 0)
-    right_panel = curses.newwin(height, width // 2, 0, width // 2)  # Single long panel on the right
+    bottom_left = curses.newwin(height // 2 - 2, width // 2, height // 2, 0)
+    right_panel = curses.newwin(height - 3, width // 2, 0, width // 2)  # Single long panel on the right
 
     # Text entry panel at the bottom
     text_entry_panel = curses.newwin(3, width, height - 3, 0)  # 3 rows high
 
     # Initial text
-    placeholder_text = "Type '/' to enter command mode..."
+    placeholder_text = display_current_playback()
     command_input = ""  # For storing the current command input
     typing_mode = False  # Flag for typing mode
 
     # List to store user outputs
     user_outputs = []
+    current_page = 0  # Track the current page
+    page_size = 10  # Number of outputs per page
 
     # Display the initial state of the panes
     top_left.addstr(1, 1, "Top Left Pane", curses.color_pair(3))  # Border color
@@ -113,28 +87,30 @@ def main(stdscr):
                         curses.doupdate()  # Restart the curses interface
 
                         # Save the Vim output to the text file
-                        with open(vim_output_file_path, 'w+') as f:
+                        with open('../buffer/chat_current_input.txt', 'w+') as f:
                             f.write(vim_output)
 
                         # Add Vim output to user outputs
                         user_outputs.append(f"User: {vim_output.strip()}")  # Append output to the list
 
-                        # Display all user outputs in the right panel
+                        # Display outputs for the current page
                         right_panel.clear()
                         right_panel.border()
-                        # Display the last 10 outputs, or fewer if there are not enough
-                        for i, output in enumerate(user_outputs[-10:], start=2):  # Start at row 2 to leave space for the border
+                        start_index = current_page * page_size
+                        end_index = start_index + page_size
+                        for i, output in enumerate(user_outputs[start_index:end_index], start=2):  # Start at row 2 to leave space for the border
                             right_panel.addstr(i, 1, output, curses.color_pair(1))  # Show all user outputs in green
                         right_panel.refresh()
 
                     elif command_input.startswith('/chat -s'):
                         user_outputs.append(f"User: {command_input[9:]}")  # Append output to the list
 
-                        # Display all user outputs in the right panel
+                        # Display outputs for the current page
                         right_panel.clear()
                         right_panel.border()
-                        # Display the last 10 outputs, or fewer if there are not enough
-                        for i, output in enumerate(user_outputs[-10:], start=2):  # Start at row 2 to leave space for the border
+                        start_index = current_page * page_size
+                        end_index = start_index + page_size
+                        for i, output in enumerate(user_outputs[start_index:end_index], start=2):  # Start at row 2 to leave space for the border
                             right_panel.addstr(i, 1, output, curses.color_pair(1))  # Show all user outputs in green
                         right_panel.refresh()
 
@@ -145,6 +121,33 @@ def main(stdscr):
                 text_entry_panel.border()
                 text_entry_panel.addstr(1, 1, f"> {placeholder_text}", curses.color_pair(2))  # Show placeholder text
                 text_entry_panel.refresh()
+
+            # Handle pagination commands
+            elif command_input.startswith("/p"):
+                if command_input[-1] == 'n':  # Next page
+                    if (current_page + 1) * page_size < len(user_outputs):
+                        current_page += 1
+                elif command_input[-1] == 'p':  # Previous page
+                    if current_page > 0:
+                        current_page -= 1
+
+                # Reset command input and update the right panel
+                command_input = ""
+                typing_mode = False
+                text_entry_panel.clear()
+                text_entry_panel.border()
+                text_entry_panel.addstr(1, 1, f"> {placeholder_text}", curses.color_pair(2))  # Show placeholder text
+                text_entry_panel.refresh()
+
+                # Display outputs for the current page
+                right_panel.clear()
+                right_panel.border()
+                start_index = current_page * page_size
+                end_index = start_index + page_size
+                for i, output in enumerate(user_outputs[start_index:end_index], start=2):  # Start at row 2 to leave space for the border
+                    right_panel.addstr(i, 1, output, curses.color_pair(1))  # Show all user outputs in green
+                right_panel.refresh()
+
             else:
                 # Add character to command input
                 if chr(key).isprintable():  # Only allow printable characters
