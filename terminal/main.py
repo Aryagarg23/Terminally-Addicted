@@ -10,7 +10,6 @@ from server.github_api import GitHubIssueManager
 from server.todoist import TodoistAPI
 from server.youtube_api import search_youtube
 from terminal.helpers import reset_text_bar, display_or_open_in_vim, display_titles, display_git_responses, display_tasks
-from libs.media_player.term_video import play_video_and_audio
 from libs.media_player.downloader import download_media
 
 load_dotenv()
@@ -96,7 +95,6 @@ def main(stdscr):
 
                 # If the command is "/chat"
                 if command_input.startswith("/chat"):
-                    # Handle /chat -v for Vim input
                     if command_input == "/chat -l":
                         # Close the curses interface temporarily and open Vim
                         curses.endwin()  # Close the curses window
@@ -104,7 +102,7 @@ def main(stdscr):
                         curses.doupdate()  # Restart the curses interface
 
                         # Call response_generator for a long response
-                        if command_input.startswith('/chat -l --cls'):
+                        if command_input.startswith('/chat -l -cls'):
                             keep_his = False
                         else:
                             keep_his = True
@@ -123,9 +121,9 @@ def main(stdscr):
                     elif command_input.startswith('/chat -s'):
                         # Save short input to file for short response
                         with open('buffer/chat_current_input.txt', 'w+') as f:
-                            f.write(command_input[9:])  # Save user input after `/chat -s`
+                            f.write(command_input[(len('/chat -s') + 1):])
 
-                        if command_input.startswith('/chat -l -cls'):
+                        if command_input.startswith('/chat -l --cls'):
                             keep_his = False
                         else:
                             keep_his = True
@@ -133,7 +131,7 @@ def main(stdscr):
                         bot_response = response_generator(keep_history=keep_his, short_or_long=1)
 
                         # Add short response to user outputs
-                        user_outputs.append(f"User: {command_input[9:]}")
+                        user_outputs.append(f"User: {command_input[(len('/chat -s --cls') + 1):]}")
                         user_outputs.append(f"Bot: {bot_response}")
 
                         # Calculate available lines for the right panel
@@ -175,9 +173,9 @@ def main(stdscr):
                         reset_text_bar(text_entry_panel)
                 elif command_input.startswith("/git"):
                     response = None  # Initialize response variable
-                    if command_input.startswith("/git create"):
+                    if command_input.startswith("/git -create"):
                         # Extract the command arguments from the input
-                        args = command_input[11:].strip().split(' --')
+                        args = command_input[len("/git -create") + 1:].strip().split(' --')
                         title = args[0]
                         body = None
                         labels = []
@@ -193,19 +191,19 @@ def main(stdscr):
                         # Create an issue
                         response = manager.create_issue(title, body, labels)
 
-                    elif command_input.startswith("/git close"):
-                        issue_number = command_input[11:].strip()
+                    elif command_input.startswith("/git -close"):
+                        issue_number = command_input[len("/git -close") + 1:].strip()
                         response = manager.close_issue(issue_number)
 
-                    elif command_input.startswith("/git comment"):
+                    elif command_input.startswith("/git -comment"):
                         # Extract the issue number and comment text
-                        parts = command_input[13:].strip().split(' ', 1)
+                        parts = command_input[len("/git -comment") + 1:].strip().split(' ', 1)
                         issue_number = parts[0]
                         comment = parts[1] if len(parts) > 1 else ''
                         response = manager.comment_on_issue(issue_number, comment)
 
-                    elif command_input.startswith("/git list"):
-                        state_arg = command_input[10:].strip()
+                    elif command_input.startswith("/git -list"):
+                        state_arg = command_input[len("/git -list") + 1:].strip()
                         state = 'open'  # Default to 'open'
                         
                         if state_arg.startswith('--state'):
@@ -213,8 +211,8 @@ def main(stdscr):
                         
                         response = manager.list_issues(state)
 
-                    elif command_input.startswith("/git update"):
-                        args = command_input[12:].strip().split(' --')
+                    elif command_input.startswith("/git -update"):
+                        args = command_input[len("/git -update") + 1:].strip().split(' --')
                         issue_number = args[0]
                         new_title = None
                         new_body = None
@@ -228,8 +226,8 @@ def main(stdscr):
 
                         response = manager.update_issue(issue_number, new_title, new_body)
 
-                    elif command_input.startswith("/git search"):
-                        label = command_input[12:].strip()
+                    elif command_input.startswith("/git -search"):
+                        label = command_input[len("/git -search") + 1:].strip()
                         response = manager.search_issues_by_label(label)
 
                     elif command_input.startswith("/git set repo"):
@@ -253,7 +251,7 @@ def main(stdscr):
 
                 elif command_input.startswith("/todo -add"):
                     # Extract the task name and create a new task
-                    task_name = command_input[10:]  # Get the task name after the command
+                    task_name = command_input[len("/todo -add") + 1:]  # Get the task name after the command
                     response = todoist.create_task(task_name)
 
                 elif command_input == "/todo -list --more":

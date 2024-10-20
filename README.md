@@ -53,18 +53,18 @@ python terminal/main.py
 
 ### GitHub Issue Commands 🐙
 - `/git create <title> -body=Your issue description -labels=bug,urgent`: Create an issue with flair. 📝🐛
-- `/git close <issue_number>`: Close issues with a single keystroke. Feels powerful, doesn’t it? 💥
-- `/git comment <issue_number> "This is a comment"`: Drop some wisdom (or a meme) on an issue. 💬💡
-- `/git list -state=open`: List all open issues in style. No browser required. 🛠️
+- `/git -close <issue_number>`: Close issues with a single keystroke. Feels powerful, doesn’t it? 💥
+- `/git -comment <issue_number> "This is a comment"`: Drop some wisdom (or a meme) on an issue. 💬💡
+- `/git -list -state=open`: List all open issues in style. No browser required. 🛠️
 - `/git set repo owner/repo_name`: Set your repository and dominate the world of code from the terminal. 🔧🌍
 
 ### Todoist Commands 📋
-- `/todo list`: Show your tasks. Yes, the ones you’ve been avoiding. 📝
-- `/todo add <task>`: Add a new task to your ever-growing list of things to procrastinate on. 😅
-- `/todo list -more`: Scroll through more tasks (if you dare). 📜
+- `/todo -list`: Show your tasks. Yes, the ones you’ve been avoiding. 📝
+- `/todo -add <task>`: Add a new task to your ever-growing list of things to procrastinate on. 😅
+- `/todo -list -more`: Scroll through more tasks (if you dare). 📜
 
 ### YouTube Viewer 📺
-- `/yt <search for videos>`: Watch a video in glorious **ASCII** art. Who needs HD when you have ASCII?! 😂 Just type in your search query, and we’ll pick the most relevant video for you. No choices, no freedom—just pure terminal magic. 🎥✨
+- `/yt search <search for videos>`: Watch a video in glorious **ASCII** art. Who needs HD when you have ASCII?! 😂 Just type in your search query, and we’ll pick the most relevant video for you. No choices, no freedom—just pure terminal magic. 🎥✨
 
 ## Shell Name? Suggestions Needed! 💡
 We still need a catchy name for our shell. Help us out by suggesting something equally ridiculous and awesome. Current contenders:

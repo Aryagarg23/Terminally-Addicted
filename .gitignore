@@ -9,3 +9,5 @@ server/__pycache__
 terminal/__pycache__
 
 server/.env
+
+libs/media_player/__pycache__
