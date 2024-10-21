@@ -331,7 +331,13 @@ def main(stdscr):
                 
                 elif command_input.startswith('$download'):
                     url = command_input[len('$download') + 1:]
+                    curses.endwin()
+                    os.system('clear')
                     download_media(url,output_folder='./output_files/media')
+                    stdscr.clear()
+                    curses.curs_set(1)  # Show the cursor again
+                    stdscr.refresh()
+                    main(stdscr)  
 
                 # Reset command input and show placeholder again
                 command_input = ""
