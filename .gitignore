@@ -5,9 +5,12 @@ buffer
 #venv folder
 hackOHIO
 #pycache
-server/__pycache__
-terminal/__pycache__
+__pycache__/
+*.pyc
 
 server/.env
 
-libs/media_player/__pycache__
+.DS_Store
+
+# regenerate locally with prototype/command_map.py; hosted copies live on the site
+prototype/figures/

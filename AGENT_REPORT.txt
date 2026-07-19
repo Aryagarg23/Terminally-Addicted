@@ -1,0 +1,5 @@
+DONE
+Deleted prototype/context_switch_arithmetic.py and its two synthetic-seconds PNGs; git rm --cached both from tracking.
+Added prototype/command_map.py, drawing a single explanatory diagram (command_map.png): curses terminal in the center, bidirectional arrows to Spotify API / GitHub API / Todoist API / OpenAI / YouTube->ASCII renderer / Vim, each labeled with its $-command and a dry one-line caption.
+Added prototype/figures/ to .gitignore; README's Prototype section is now "Diagram", describes the map instead of the old chart, and embeds the hosted PNG at the Supabase URL for Terminally-Addicted while keeping the local regenerate command.
+Verified: command_map.png exists on disk, no PNGs remain in `git ls-files`, script runs clean via MPLCONFIGDIR + the shared venv.
