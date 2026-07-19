@@ -2,7 +2,7 @@
 
 A curses-based terminal shell that puts Spotify, GitHub issues, Todoist, a GPT chatbot, and YouTube (rendered as ASCII/terminal video) behind one command bar, so you never alt-tab out of the terminal.
 
-Built in 36-ish hours at HackOHI/O 2024 (October 2024).
+Built in 36-ish hours at HackOHI/O 2024 (October 2024). Took Most Original. Demo: https://www.youtube.com/watch?v=SqKeySB5aBU
 
 ## What it does
 
