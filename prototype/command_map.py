@@ -8,8 +8,8 @@ same window. No screenshot, no invented numbers — just the map of what
 talks to what.
 
 Run:
-    MPLCONFIGDIR=/home/arya/projects/hackathons/.mplcache \
-    /home/arya/projects/hackathons/.venv/bin/python prototype/command_map.py
+    python3 -m pip install matplotlib numpy
+    python3 prototype/command_map.py
 """
 import os
 
@@ -18,8 +18,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
-
-plt.style.use("/home/arya/projects/hackathons/.style/garg-paper.mplstyle")
 
 FIGURES_DIR = os.path.join(os.path.dirname(__file__), "figures")
 os.makedirs(FIGURES_DIR, exist_ok=True)

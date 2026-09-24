@@ -19,7 +19,32 @@ The odd one out is `/yt` and `$download`: search YouTube, pull the top result wi
 - `server/spotify_api.py`, `server/github_api.py`, `server/todoist.py`, `server/youtube_api.py`, `server/chatbot.py` — one thin wrapper per external API (spotipy, GitHub REST, Todoist REST, YouTube Data API, OpenAI).
 - `libs/media_player/downloader.py` — pulls video+audio with `yt-dlp`.
 - `libs/media_player/term_video.py` — spawns the Go video renderer (`libs/pot` submodule) and an audio thread, synced with a `SIGUSR1` handler.
-- Everything reads credentials from `server/.env` (see `.env.template`), loaded with `python-dotenv`.
+- API clients read credentials from a root-level `.env` through `python-dotenv`. The
+  `$set env` command edits that same file. Start from the included template:
+
+  ```sh
+  cp server/.env.template .env
+  ```
+
+  Fill in the values you use: `SPOTIPY_CLIENT_ID`, `SPOTIPY_CLIENT_SECRET`,
+  `GITHUB_TOKEN`, `TODOIST_API_TOKEN`, `OPENAI_API_KEY`, and `YOUTUBE_API_TOKEN`.
+  Keep real credentials in `.env`, never commit them.
+
+## Run
+
+Use Python 3 on a Unix-like terminal with curses and Vim installed. The media player
+also needs Go and FFmpeg; YouTube playback depends on the `libs/pot` submodule. Clone
+with submodules, install the Python dependencies, then launch from the repository root:
+
+```sh
+git clone --recurse-submodules https://github.com/Aryagarg23/Terminally-Addicted.git
+cd Terminally-Addicted
+python3 -m pip install -r requirements.txt
+python3 terminal/main.py
+```
+
+The integrations call external APIs and need valid credentials and network access.
+Some terminal media playback behavior is platform-specific.
 
 ## Diagram
 

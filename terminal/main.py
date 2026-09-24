@@ -26,7 +26,7 @@ os.makedirs(text_dir, exist_ok=True)
 
 COMMANDS_HELP = {
 '$help': 'Display this help information.',
-'$set env': 'Open the .env file in Vim for editing.',
+'$set env': 'Open the root .env file in Vim for editing.',
 '$chat -l': 'Open a long chat response in Vim.',
 '$chat -s': 'Send a short chat message.',
 '$sp -cs <song name>': 'Change the current song to the specified song name.',
@@ -127,7 +127,7 @@ def main(stdscr):
                 if command_input.startswith("$set env"):
                     # Open the .env file in Vim
                     curses.endwin()  # End the curses session before opening Vim
-                    subprocess.run(['vim', 'server/.env'])  # Open .env file
+                    subprocess.run(['vim', '.env'])  # Open the root .env file
                     stdscr.clear()  # Clear the screen after Vim is closed
                     stdscr.refresh()
                     command_input = ""
